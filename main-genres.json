@@ -1,0 +1,135 @@
+[
+  {
+    "id": "classical",
+    "name": "Classical",
+    "colorHue": 200,
+    "prompt": "Classical instrumental music, refined and expressive mood, acoustic orchestra with strings, woodwinds, brass and percussion, flexible tempo with dynamic variation, structured composition with thematic development and natural concert hall acoustics.",
+    "isBuiltIn": true
+  },
+  {
+    "id": "jazz",
+    "name": "Jazz",
+    "colorHue": 180,
+    "prompt": "Jazz instrumental music, expressive and sophisticated mood, acoustic drum kit with ride cymbal, upright bass, piano and melodic horns, medium swing feel, improvised phrasing with live ensemble recording character.",
+    "isBuiltIn": true
+  },
+  {
+    "id": "blues",
+    "name": "Blues",
+    "colorHue": 220,
+    "prompt": "Blues instrumental music, soulful and grounded mood, expressive guitar lines, bass and drum kit, slow to mid-tempo groove with shuffle feel, simple harmonic movement with warm raw production.",
+    "isBuiltIn": true
+  },
+  {
+    "id": "soul",
+    "name": "Soul",
+    "colorHue": 40,
+    "prompt": "Soul instrumental music, warm and heartfelt mood, live drums, electric bass, keys and melodic leads, mid-tempo groove, rich chord movement with warm analog-style production.",
+    "isBuiltIn": true
+  },
+  {
+    "id": "funk",
+    "name": "Funk",
+    "colorHue": 55,
+    "prompt": "Funk instrumental music, tight and groove-focused mood, syncopated electric bass, crisp drum kit, rhythm guitar and horn stabs, steady mid-tempo pocket, repetitive rhythm-driven structure with dry punchy mix.",
+    "isBuiltIn": true
+  },
+  {
+    "id": "disco",
+    "name": "Disco",
+    "colorHue": 300,
+    "prompt": "Disco instrumental music, uplifting dancefloor mood, four-on-the-floor kick drum, bass guitar, rhythmic guitar and string layers, steady dance tempo, loop-based arrangement with polished bright production.",
+    "isBuiltIn": true
+  },
+  {
+    "id": "rnb",
+    "name": "R&B",
+    "colorHue": 30,
+    "prompt": "R&B instrumental music, smooth and intimate mood, electronic or live drums, warm bass, soft keys and melodic leads, slow to mid-tempo groove, song-oriented structure with clean modern production.",
+    "isBuiltIn": true
+  },
+  {
+    "id": "hiphop",
+    "name": "Hip Hop",
+    "colorHue": 0,
+    "prompt": "Hip hop instrumental music, grounded and rhythmic mood, punchy kick and snare drums, deep sub bass and minimal melodic elements, steady mid-tempo rhythm, loop-based structure with clean modern production.",
+    "isBuiltIn": true
+  },
+  {
+    "id": "electronic",
+    "name": "Electronic",
+    "colorHue": 280,
+    "prompt": "Electronic instrumental music, driving and synthetic mood, drum machines, synthesizers and electronic bass, steady repetitive rhythmic pulse, loop-based structure designed for continuous playback, clean and controlled digital production.",
+    "isBuiltIn": true
+  },
+  {
+    "id": "ambient",
+    "name": "Ambient",
+    "colorHue": 190,
+    "prompt": "Ambient instrumental music, calm and immersive mood, sustained pads and evolving textures, very slow tempo or no rhythmic pulse, gradual harmonic movement, spacious reverberant sound design with wide stereo depth.",
+    "isBuiltIn": true
+  },
+  {
+    "id": "pop",
+    "name": "Pop",
+    "colorHue": 45,
+    "prompt": "Pop instrumental music, bright and accessible mood, steady drums and bass, clear melodic hooks with synths or guitars, mid to up-tempo rhythm, verse-chorus structure with polished radio-ready production.",
+    "isBuiltIn": true
+  },
+  {
+    "id": "rock",
+    "name": "Rock",
+    "colorHue": 25,
+    "prompt": "Rock instrumental music, energetic and driving mood, electric guitars, bass and acoustic drum kit, steady mid-tempo rhythm, song-based structure with live band production character.",
+    "isBuiltIn": true
+  },
+  {
+    "id": "metal",
+    "name": "Metal",
+    "colorHue": 320,
+    "prompt": "Metal instrumental music, intense and aggressive mood, high-gain distorted guitars, heavy bass and powerful drum kit, fast driving rhythm with tight precision, riff-based structure with dense modern production.",
+    "isBuiltIn": true
+  },
+  {
+    "id": "punk",
+    "name": "Punk",
+    "colorHue": 340,
+    "prompt": "Punk instrumental music, raw and rebellious mood, distorted guitars, bass and fast drum kit, very fast tempo, short direct structure with lo-fi aggressive production.",
+    "isBuiltIn": true
+  },
+  {
+    "id": "folk",
+    "name": "Folk",
+    "colorHue": 120,
+    "prompt": "Folk instrumental music, warm and intimate mood, acoustic instruments with natural dynamics, gentle percussion and simple melodic lines, slow to mid-tempo rhythm, storytelling-oriented structure with organic acoustic recording.",
+    "isBuiltIn": true
+  },
+  {
+    "id": "country",
+    "name": "Country",
+    "colorHue": 35,
+    "prompt": "Country instrumental music, warm and grounded mood, acoustic and electric guitars, steady bass and drum kit, mid-tempo groove, clear melodic hooks with clean traditional production.",
+    "isBuiltIn": true
+  },
+  {
+    "id": "latin",
+    "name": "Latin",
+    "colorHue": 15,
+    "prompt": "Latin instrumental music, lively and rhythmic mood, percussion-forward arrangement with bass and melodic instruments, syncopated dance rhythms, steady groove-based structure with bright energetic production.",
+    "isBuiltIn": true
+  },
+  {
+    "id": "reggae",
+    "name": "Reggae",
+    "colorHue": 100,
+    "prompt": "Reggae instrumental music, relaxed and steady mood, offbeat guitar skanks, deep bass and drum kit, slow to mid-tempo one-drop rhythm, groove-centered structure with warm spacious production.",
+    "isBuiltIn": true
+  },
+  {
+    "id": "world",
+    "name": "World Music",
+    "colorHue": 60,
+    "prompt": "World instrumental music, culturally rooted and expressive mood, regional acoustic instruments and traditional rhythmic patterns, non-western tonal colors, repetitive ceremonial or dance forms with natural organic production.",
+    "isBuiltIn": true
+  }
+]

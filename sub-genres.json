@@ -1,0 +1,800 @@
+{
+  "classical": [
+    {
+      "name": "Romantic",
+      "prompt": "Classical instrumental music, Romantic style, emotional and dramatic mood, lush full orchestra with sweeping strings and rich harmonies, flexible tempo with strong dynamic contrast, long-form thematic development with concert hall acoustics."
+    },
+    {
+      "name": "Baroque",
+      "prompt": "Classical instrumental music, Baroque style, formal and intricate mood, harpsichord, strings and small ensemble instrumentation, steady moderate tempo with continuous rhythmic motion, clear counterpoint and dry intimate acoustics."
+    },
+    {
+      "name": "Modern Classical",
+      "prompt": "Classical instrumental music, Modern Classical style, tense and abstract mood, orchestral instruments with unconventional techniques, irregular tempo shifts and complex rhythms, fragmented structure with dissonant harmony and experimental production."
+    },
+    {
+      "name": "Opera",
+      "prompt": "Classical instrumental music, Opera style, dramatic and theatrical mood, full orchestra supporting bold melodic lines, flexible tempo shaped by expressive phrasing, scene-like structure with heightened dynamics and stage-like acoustics."
+    },
+    {
+      "name": "Chamber Music",
+      "prompt": "Classical instrumental music, Chamber Music style, intimate and focused mood, small ensemble of strings or mixed acoustic instruments, moderate tempo with subtle rhythmic variation, conversational texture and close dry recording."
+    },
+    {
+      "name": "Symphony",
+      "prompt": "Classical instrumental music, Symphony style, grand and powerful mood, large orchestra with full sections, varied tempo across contrasting movements, extended structure with thematic transformation and spacious hall acoustics."
+    },
+    {
+      "name": "Orchestral",
+      "prompt": "Classical instrumental music, Orchestral style, expansive and cinematic mood, full orchestra with prominent strings and brass, steady tempo with controlled builds, clear sectional form and wide spatial depth."
+    },
+    {
+      "name": "Choral",
+      "prompt": "Classical instrumental music, Choral style, solemn and spiritual mood, choir textures with minimal accompaniment, slow to moderate tempo, layered polyphony in a resonant reverberant space."
+    },
+    {
+      "name": "Contemporary Classical",
+      "prompt": "Classical instrumental music, Contemporary Classical style, restrained and modern mood, acoustic instruments with repetitive patterns and subtle shifts, steady tempo with gradual variation, minimalist structure and clean contemporary production."
+    },
+    {
+      "name": "Minimalism",
+      "prompt": "Classical instrumental music, Minimalism style, hypnotic and meditative mood, repeating motifs in a small ensemble, steady unchanging tempo, gradual evolution with subtle harmonic change and spacious clarity."
+    }
+  ],
+  "jazz": [
+    {
+      "name": "Smooth Jazz",
+      "prompt": "Jazz instrumental music, Smooth Jazz style, relaxed and polished mood, soft drum groove, electric bass and smooth melodic instruments, slow to mid-tempo straight rhythm, song-oriented structure with clean modern production."
+    },
+    {
+      "name": "Bebop",
+      "prompt": "Jazz instrumental music, Bebop style, energetic and intense mood, fast improvisation over complex harmony, acoustic drums, upright bass and bright melodic instruments, very fast tempo, continuous improvisational structure with live sound."
+    },
+    {
+      "name": "Swing",
+      "prompt": "Jazz instrumental music, Swing style, lively and upbeat mood, big band brass and reeds with rhythm section, medium to fast swing tempo, dance-oriented structure with strong rhythmic drive and punchy arrangement."
+    },
+    {
+      "name": "Cool Jazz",
+      "prompt": "Jazz instrumental music, Cool Jazz style, calm and restrained mood, soft articulated horns and light rhythm section, moderate tempo with relaxed phrasing, open airy structure and smooth dynamics."
+    },
+    {
+      "name": "Free Jazz",
+      "prompt": "Jazz instrumental music, Free Jazz style, raw and chaotic mood, extended techniques and atonal improvisation, free rhythm without fixed tempo, open unstructured form with gritty live production."
+    },
+    {
+      "name": "Fusion",
+      "prompt": "Jazz instrumental music, Fusion style, energetic and exploratory mood, electric bass, drum kit, keyboards and amplified melodic instruments, steady mid-tempo groove, extended solos with clean modern production."
+    },
+    {
+      "name": "Latin Jazz",
+      "prompt": "Jazz instrumental music, Latin Jazz style, vibrant and rhythmic mood, jazz ensemble with congas and Latin percussion, syncopated Afro-Latin groove, mid-tempo dance feel, groove-based structure with bright production."
+    },
+    {
+      "name": "Vocal Jazz",
+      "prompt": "Jazz instrumental music, Vocal Jazz style, intimate and expressive mood, soft rhythm section supporting melodic lead lines, slow to mid-tempo swing, lounge-like structure with warm close recording."
+    },
+    {
+      "name": "Acid Jazz",
+      "prompt": "Jazz instrumental music, Acid Jazz style, groovy and urban mood, funk-influenced bass and drums with jazz chords, steady mid-tempo groove, loop-based structure with clean punchy production."
+    },
+    {
+      "name": "Nu Jazz",
+      "prompt": "Jazz instrumental music, Nu Jazz style, modern and experimental mood, electronic beats blended with acoustic jazz textures, steady club-oriented tempo, hybrid structure with contemporary sound design."
+    }
+  ],
+  "blues": [
+    {
+      "name": "Delta Blues",
+      "prompt": "Blues instrumental music, Delta Blues style, raw and intimate mood, acoustic guitar with slide textures and minimal percussion, slow tempo with loose phrasing, repetitive structure with close dry recording."
+    },
+    {
+      "name": "Chicago Blues",
+      "prompt": "Blues instrumental music, Chicago Blues style, gritty and urban mood, electric guitar, bass, drums and amplified harmonica, mid-tempo shuffle, structured groove form with punchy amplified production."
+    },
+    {
+      "name": "Electric Blues",
+      "prompt": "Blues instrumental music, Electric Blues style, powerful and expressive mood, overdriven electric guitar leads with bass and drums, slow to mid-tempo groove, solo-focused structure with warm amp tone."
+    },
+    {
+      "name": "Blues-Rock",
+      "prompt": "Blues instrumental music, Blues-Rock style, energetic and driving mood, heavy guitar riffs with blues phrasing, bass and rock drums, mid-tempo rhythm, song-based structure with strong dynamics."
+    },
+    {
+      "name": "Rhythm and Blues",
+      "prompt": "Blues instrumental music, Rhythm and Blues style, upbeat and rhythmic mood, horn section, guitar, bass and drums, steady mid-tempo groove, dance-oriented structure with clean tight production."
+    },
+    {
+      "name": "Soul Blues",
+      "prompt": "Blues instrumental music, Soul Blues style, emotional and smooth mood, expressive guitar, warm organ chords, bass and drums, slow to mid-tempo groove, melodic structure with warm polished production."
+    },
+    {
+      "name": "Country Blues",
+      "prompt": "Blues instrumental music, Country Blues style, rustic and relaxed mood, fingerpicked acoustic guitar and light percussion, slow tempo, simple repetitive form with natural acoustic recording."
+    },
+    {
+      "name": "Acoustic Blues",
+      "prompt": "Blues instrumental music, Acoustic Blues style, stripped-down and authentic mood, solo acoustic guitar with percussive picking, slow tempo, minimal structure with close microphone warmth."
+    },
+    {
+      "name": "Piano Blues",
+      "prompt": "Blues instrumental music, Piano Blues style, lively and rhythmic mood, rolling piano patterns with bass and drums, mid-tempo groove, repetitive structure with energetic feel."
+    },
+    {
+      "name": "Texas Blues",
+      "prompt": "Blues instrumental music, Texas Blues style, confident and swinging mood, strong electric guitar tone with bass and drums, mid-tempo swing groove, solo-friendly structure with clean punchy production."
+    }
+  ],
+  "soul": [
+    {
+      "name": "Neo Soul",
+      "prompt": "Soul instrumental music, Neo Soul style, smooth and introspective mood, live drums, electric bass and extended chord keyboards, relaxed mid-tempo groove, layered arrangement with warm modern production."
+    },
+    {
+      "name": "Motown",
+      "prompt": "Soul instrumental music, Motown style, upbeat and joyful mood, tight drum groove, melodic bass, piano and bright horn accents, steady mid-tempo rhythm, concise hook-driven structure with polished production."
+    },
+    {
+      "name": "Classic Soul",
+      "prompt": "Soul instrumental music, Classic Soul style, expressive and emotional mood, live rhythm section with horn stabs and organ, mid-tempo groove, verse-chorus form with strong melodic hooks."
+    },
+    {
+      "name": "Southern Soul",
+      "prompt": "Soul instrumental music, Southern Soul style, raw and gritty mood, strong backbeat drums, bass and organ textures, mid-tempo groove, emotionally driven structure with minimal polish."
+    },
+    {
+      "name": "Psychedelic Soul",
+      "prompt": "Soul instrumental music, Psychedelic Soul style, dreamy and exploratory mood, rhythm section with swirling keys and subtle effects, mid-tempo groove, experimental arrangement with textured production."
+    },
+    {
+      "name": "Northern Soul",
+      "prompt": "Soul instrumental music, Northern Soul style, energetic and dance-focused mood, fast drums, driving bass and bright horns, up-tempo rhythm, repetitive high-energy structure with clean production."
+    },
+    {
+      "name": "Quiet Storm",
+      "prompt": "Soul instrumental music, Quiet Storm style, intimate and romantic mood, soft drums, warm bass and gentle electric piano, slow tempo, smooth flowing structure with low dynamics and warm production."
+    },
+    {
+      "name": "New Jack Swing",
+      "prompt": "Soul instrumental music, New Jack Swing style, upbeat and rhythmic mood, drum machines, bass and bright keyboard stabs, mid-tempo swing groove, dance-oriented structure with clean modern production."
+    },
+    {
+      "name": "Blue-Eyed Soul",
+      "prompt": "Soul instrumental music, Blue-Eyed Soul style, smooth and accessible mood, balanced rhythm section, melodic keys and light guitar, mid-tempo groove, pop-influenced structure with polished production."
+    },
+    {
+      "name": "Deep Soul",
+      "prompt": "Soul instrumental music, Deep Soul style, intense and emotional mood, expressive melodic leads, warm organ chords and steady drums, slow to mid-tempo groove, dramatic structure with strong dynamic contrast."
+    }
+  ],
+  "funk": [
+    {
+      "name": "P-Funk",
+      "prompt": "Funk instrumental music, P-Funk style, playful and expansive mood, heavy syncopated bass, drums and layered synth textures, mid-tempo groove, loose repetitive structure with thick low-end and warm saturation."
+    },
+    {
+      "name": "G-Funk",
+      "prompt": "Funk instrumental music, G-Funk style, laid-back and smooth mood, melodic bass, relaxed drums and smooth synth chords, slow to mid-tempo groove, open structure with polished low-end production."
+    },
+    {
+      "name": "Electro Funk",
+      "prompt": "Funk instrumental music, Electro Funk style, robotic and energetic mood, drum machines, synth bass and bright electronic leads, mid-tempo groove, repetitive structure with clean electronic production."
+    },
+    {
+      "name": "Jazz-Funk",
+      "prompt": "Funk instrumental music, Jazz-Funk style, sophisticated and groovy mood, tight rhythm section with jazzy chords and melodic improvisation, steady mid-tempo pocket, structured grooves with clean punchy mix."
+    },
+    {
+      "name": "Funk Rock",
+      "prompt": "Funk instrumental music, Funk Rock style, aggressive and energetic mood, guitar-driven riffs, slap bass and strong drums, mid-tempo groove, song-based structure with pronounced rhythmic accents."
+    },
+    {
+      "name": "Boogie",
+      "prompt": "Funk instrumental music, Boogie style, upbeat and dance-oriented mood, bass-driven groove, bright keyboard chords and steady drums, mid to up-tempo rhythm, repetitive hook-driven structure with polished dance production."
+    },
+    {
+      "name": "Synth Funk",
+      "prompt": "Funk instrumental music, Synth Funk style, futuristic and smooth mood, analog synth leads, electronic bass and tight drums, mid-tempo groove, loop-based structure with clean digital production."
+    },
+    {
+      "name": "Deep Funk",
+      "prompt": "Funk instrumental music, Deep Funk style, raw and gritty mood, hard-hitting drums, syncopated bass and minimal harmony, mid-tempo pocket, repetitive groove with minimal polish and dry mix."
+    },
+    {
+      "name": "Go-Go",
+      "prompt": "Funk instrumental music, Go-Go style, energetic and communal mood, extended live percussion, bass and drums with repeating patterns, steady mid-tempo groove, long-form structure with live performance feel."
+    },
+    {
+      "name": "Afro-Funk",
+      "prompt": "Funk instrumental music, Afro-Funk style, hypnotic and rhythmic mood, polyrhythmic percussion, bass and guitar riffs, mid-tempo groove, groove-centered structure with organic production."
+    }
+  ],
+  "disco": [
+    {
+      "name": "Nu-Disco",
+      "prompt": "Disco instrumental music, Nu-Disco style, modern and stylish mood, electronic bass, rhythmic guitar and glossy synth layers, steady dance tempo, loop-driven structure with contemporary club production."
+    },
+    {
+      "name": "Eurodisco",
+      "prompt": "Disco instrumental music, Eurodisco style, bright and melodic mood, synth hooks, bass and steady kick, mid-tempo dance rhythm, catchy repetitive structure with clean polished production."
+    },
+    {
+      "name": "Hi-NRG",
+      "prompt": "Disco instrumental music, Hi-NRG style, high-energy and intense mood, fast kick drum, driving synth bass and bright leads, very fast tempo, relentless repetitive structure with sharp dancefloor production."
+    },
+    {
+      "name": "Italo Disco",
+      "prompt": "Disco instrumental music, Italo Disco style, nostalgic and melodic mood, drum machines, synth bass and arpeggiated leads, steady mid-tempo groove, simple repetitive structure with retro electronic production."
+    },
+    {
+      "name": "Post-Disco",
+      "prompt": "Disco instrumental music, Post-Disco style, smooth and refined mood, funky bass, tight drums and rhythmic guitar, mid-tempo groove, groove-based structure with sophisticated polished production."
+    },
+    {
+      "name": "Disco House",
+      "prompt": "Disco instrumental music, Disco House style, upbeat and club-focused mood, house kick drum with disco bass and filtered chords, steady dance tempo, loop-driven structure with modern club production."
+    },
+    {
+      "name": "Disco Polo",
+      "prompt": "Disco instrumental music, Disco Polo style, cheerful and simple mood, bright keyboards, steady kick and bass, fast tempo, repetitive singalong-like structure with clean party production."
+    },
+    {
+      "name": "Space Disco",
+      "prompt": "Disco instrumental music, Space Disco style, cosmic and expansive mood, wide synth pads, steady kick and bass, mid-tempo groove, repetitive structure with spacious effects and reverb."
+    },
+    {
+      "name": "Boogie",
+      "prompt": "Disco instrumental music, Boogie style, groovy and smooth mood, bass-heavy rhythm section with bright keys and tight drums, mid-tempo groove, repetitive structure with warm polished production."
+    },
+    {
+      "name": "Eurobeat",
+      "prompt": "Disco instrumental music, Eurobeat style, fast and energetic mood, rapid kick drum, driving synth bass and bright melodic leads, very fast tempo, high-energy repetitive structure with sharp production."
+    }
+  ],
+  "rnb": [
+    {
+      "name": "Contemporary R&B",
+      "prompt": "R&B instrumental music, Contemporary R&B style, polished and modern mood, layered drums, deep bass and smooth keyboard textures, mid-tempo groove, structured arrangement with glossy production."
+    },
+    {
+      "name": "Alternative R&B",
+      "prompt": "R&B instrumental music, Alternative R&B style, moody and atmospheric mood, minimal drums, deep bass and ambient textures, slow to mid-tempo rhythm, open structure with experimental sound design."
+    },
+    {
+      "name": "New Jack Swing",
+      "prompt": "R&B instrumental music, New Jack Swing style, energetic and rhythmic mood, drum machines, punchy bass and bright keyboard stabs, mid-tempo swing groove, dance-oriented structure with clean production."
+    },
+    {
+      "name": "Quiet Storm",
+      "prompt": "R&B instrumental music, Quiet Storm style, romantic and late-night mood, soft drums, warm bass and gentle electric piano, slow tempo, smooth flowing structure with warm low-dynamic production."
+    },
+    {
+      "name": "Hip Hop Soul",
+      "prompt": "R&B instrumental music, Hip Hop Soul style, soulful and rhythmic mood, hip hop-influenced drums, warm bass and rich chord keys, mid-tempo groove, loop-based structure with clean production."
+    },
+    {
+      "name": "Urban Contemporary",
+      "prompt": "R&B instrumental music, Urban Contemporary style, catchy and modern mood, tight drum programming, bass and melodic hooks, mid-tempo rhythm, radio-oriented structure with polished production."
+    },
+    {
+      "name": "Slow Jams",
+      "prompt": "R&B instrumental music, Slow Jams style, sensual and relaxed mood, soft drums, sustained chords and warm bass, very slow tempo, minimal structure with smooth even dynamics."
+    },
+    {
+      "name": "Neo Soul",
+      "prompt": "R&B instrumental music, Neo Soul style, organic and warm mood, live drums, electric bass and extended chord keyboards, relaxed mid-tempo groove, layered arrangement with natural production."
+    },
+    {
+      "name": "G-Funk",
+      "prompt": "R&B instrumental music, G-Funk style, laid-back and smooth mood, synth pads, warm bass and relaxed drums, slow to mid-tempo groove, open structure with polished low-end production."
+    },
+    {
+      "name": "Trap Soul",
+      "prompt": "R&B instrumental music, Trap Soul style, dark and atmospheric mood, trap drum patterns, deep bass and sparse melodic textures, slow tempo, minimal structure with modern polished production."
+    }
+  ],
+  "hiphop": [
+    {
+      "name": "Trap",
+      "prompt": "Hip hop instrumental music, Trap style, dark and tense mood, heavy sustained sub bass, sharp kick drums and rolling hi-hats, slow half-time rhythmic feel, minimal arrangement with modern polished production."
+    },
+    {
+      "name": "Gangsta Rap",
+      "prompt": "Hip hop instrumental music, Gangsta Rap style, aggressive and confrontational mood, hard drum hits, deep bass and sparse melodic content, mid-tempo rhythm, repetitive structure with heavy low-end emphasis."
+    },
+    {
+      "name": "Boom Bap",
+      "prompt": "Hip hop instrumental music, Boom Bap style, gritty and focused mood, strong kick and snare with sampled textures, mid-tempo rhythm, loop-based structure with raw unpolished production."
+    },
+    {
+      "name": "Conscious Hip Hop",
+      "prompt": "Hip hop instrumental music, Conscious Hip Hop style, reflective and thoughtful mood, clean drums, melodic bass and subtle chord textures, relaxed mid-tempo rhythm, open loop-based structure with balanced production."
+    },
+    {
+      "name": "Southern Hip Hop",
+      "prompt": "Hip hop instrumental music, Southern Hip Hop style, energetic and bouncy mood, heavy bass, punchy drums and simple melodic hooks, mid-tempo groove, repetitive structure with bold low-frequency focus."
+    },
+    {
+      "name": "East Coast Hip Hop",
+      "prompt": "Hip hop instrumental music, East Coast Hip Hop style, tight and rhythmic mood, crisp kick and snare drums with sampled textures, mid-tempo rhythm, loop-based structure with minimal melodic variation."
+    },
+    {
+      "name": "West Coast Hip Hop",
+      "prompt": "Hip hop instrumental music, West Coast Hip Hop style, laid-back and smooth mood, deep bass lines, relaxed drums and smooth synth textures, mid-tempo groove, open structure with clean production."
+    },
+    {
+      "name": "Drill",
+      "prompt": "Hip hop instrumental music, Drill style, menacing and aggressive mood, sliding sub bass, sparse drums and minimal melody, fast tempo with half-time drum feel, dark repetitive structure with heavy low-end."
+    },
+    {
+      "name": "Mumble Rap",
+      "prompt": "Hip hop instrumental music, Mumble Rap style, melodic and atmospheric mood, soft drums, sustained bass and simple melodic leads, mid to fast tempo, loop-based structure with smooth modern production."
+    },
+    {
+      "name": "Underground Hip Hop",
+      "prompt": "Hip hop instrumental music, Underground Hip Hop style, experimental and abstract mood, unconventional drums and layered samples, irregular mid-tempo rhythm, non-standard structure with raw artistic production."
+    }
+  ],
+  "electronic": [
+    {
+      "name": "House",
+      "prompt": "Electronic instrumental music, House style, uplifting and hypnotic mood, four-on-the-floor kick drum, electronic bass and chord stabs, steady mid-tempo dance rhythm, loop-driven club-oriented structure with clean production."
+    },
+    {
+      "name": "Techno",
+      "prompt": "Electronic instrumental music, Techno style, focused and mechanical mood, repetitive kick drum, minimal percussion and synthetic textures, fast steady tempo, hypnotic loop-based structure with minimal harmonic change."
+    },
+    {
+      "name": "Trance",
+      "prompt": "Electronic instrumental music, Trance style, euphoric and expansive mood, arpeggiated synthesizers and sustained pads, fast steady tempo, long build-ups with gradual dynamic progression and breakdown sections."
+    },
+    {
+      "name": "Drum and Bass",
+      "prompt": "Electronic instrumental music, Drum and Bass style, energetic and intense mood, fast breakbeat drums and deep rolling bass lines, very fast tempo, driving repetitive structure with high-energy production."
+    },
+    {
+      "name": "Dubstep",
+      "prompt": "Electronic instrumental music, Dubstep style, dark and heavy mood, wobbling sub bass and sharp snare hits, slow half-time rhythmic feel, drop-focused structure with strong low-end emphasis."
+    },
+    {
+      "name": "EDM",
+      "prompt": "Electronic instrumental music, EDM style, energetic and celebratory mood, layered synthesizers and powerful kick drums, fast tempo, build-and-drop structure with polished festival-style production."
+    },
+    {
+      "name": "Electro",
+      "prompt": "Electronic instrumental music, Electro style, robotic and punchy mood, synthetic bass lines and electronic drums, mid-tempo groove, repetitive structure with clean digital edge."
+    },
+    {
+      "name": "IDM",
+      "prompt": "Electronic instrumental music, IDM style, complex and abstract mood, intricate drum programming and evolving synth textures, irregular tempo patterns, experimental structure with detailed sound design."
+    },
+    {
+      "name": "Breakbeat",
+      "prompt": "Electronic instrumental music, Breakbeat style, energetic and rhythmic mood, chopped breakbeat drums and electronic bass, mid to fast tempo, loop-based structure with rhythmic variation."
+    },
+    {
+      "name": "UK Garage",
+      "prompt": "Electronic instrumental music, UK Garage style, groovy and uplifting mood, shuffled drum patterns and deep bass, mid-tempo two-step rhythm, groove-centered structure with clean modern production."
+    }
+  ],
+  "ambient": [
+    {
+      "name": "Ambient",
+      "prompt": "Ambient instrumental music, Ambient style, calm and neutral mood, soft sustained pads and evolving textures, very slow tempo or no rhythmic pulse, gradual harmonic drift with spacious reverberant sound design."
+    },
+    {
+      "name": "Dark Ambient",
+      "prompt": "Ambient instrumental music, Dark Ambient style, ominous and tense mood, low-frequency drones and dark sustained textures, no rhythmic percussion, slow evolving structure with deep reverberation."
+    },
+    {
+      "name": "Drone",
+      "prompt": "Ambient instrumental music, Drone style, meditative and immersive mood, continuous sustained tones and harmonic layers, no rhythmic movement, minimal long-form evolution with subtle spectral change."
+    },
+    {
+      "name": "Noise",
+      "prompt": "Ambient instrumental music, Noise style, harsh and confrontational mood, distorted textures and dense sound layers, no steady rhythm, non-linear structure with aggressive sound design."
+    },
+    {
+      "name": "Experimental",
+      "prompt": "Ambient instrumental music, Experimental style, abstract and unpredictable mood, unconventional sound sources and processing, irregular or absent rhythm, open-ended structure with exploratory production."
+    },
+    {
+      "name": "Musique Concrète",
+      "prompt": "Ambient instrumental music, Musique Concrète style, textural and conceptual mood, processed recorded sounds and acoustic fragments, no traditional rhythm, collage-like structure with experimental editing."
+    },
+    {
+      "name": "Glitch",
+      "prompt": "Ambient instrumental music, Glitch style, fragmented and digital mood, clicks, cuts and digital artifacts, irregular rhythmic fragments, deconstructed structure with detailed micro-edits."
+    },
+    {
+      "name": "Field Recordings",
+      "prompt": "Ambient instrumental music, Field Recordings style, immersive and documentary mood, environmental recordings with subtle processing, no rhythmic structure, layered soundscape with natural spatial depth."
+    },
+    {
+      "name": "Space Music",
+      "prompt": "Ambient instrumental music, Space Music style, vast and expansive mood, wide pads and slow-moving harmonic layers, very slow tempo, expansive structure with large stereo field and long reverbs."
+    },
+    {
+      "name": "New Age",
+      "prompt": "Ambient instrumental music, New Age style, peaceful and soothing mood, soft synthesizers and gentle melodic textures, slow steady tempo, simple calming structure with smooth production."
+    }
+  ],
+  "pop": [
+    {
+      "name": "Dance Pop",
+      "prompt": "Pop instrumental music, Dance Pop style, energetic and upbeat mood, electronic drums, punchy bass and bright synth hooks, fast dance tempo, hook-driven structure with polished club-ready production."
+    },
+    {
+      "name": "Synth-Pop",
+      "prompt": "Pop instrumental music, Synth-Pop style, nostalgic and melodic mood, drum machines, synth bass and warm pads, mid-tempo groove, song-oriented structure with clean electronic production."
+    },
+    {
+      "name": "Electropop",
+      "prompt": "Pop instrumental music, Electropop style, glossy and modern mood, tight electronic drums, deep bass and layered synth leads, mid to fast tempo, hook-based structure with high polish."
+    },
+    {
+      "name": "Indie Pop",
+      "prompt": "Pop instrumental music, Indie Pop style, relaxed and playful mood, light drums, bass and clean guitars, mid-tempo rhythm, simple structure with minimal production and airy texture."
+    },
+    {
+      "name": "Art Pop",
+      "prompt": "Pop instrumental music, Art Pop style, expressive and experimental mood, varied instrumentation and shifting textures, mid-tempo rhythm, unconventional arrangement with artistic sound design."
+    },
+    {
+      "name": "Teen Pop",
+      "prompt": "Pop instrumental music, Teen Pop style, cheerful and energetic mood, bright synths, steady drums and bass, fast tempo, simple catchy structure with polished production."
+    },
+    {
+      "name": "Bubblegum Pop",
+      "prompt": "Pop instrumental music, Bubblegum Pop style, fun and super catchy mood, simple melodies, bouncy bass and electronic drums, fast tempo, highly repetitive hook-based structure."
+    },
+    {
+      "name": "Europop",
+      "prompt": "Pop instrumental music, Europop style, melodic and energetic mood, synth leads, steady kick and bass, mid to fast tempo, catchy song structure with clean polished production."
+    },
+    {
+      "name": "K-Pop",
+      "prompt": "Pop instrumental music, K-Pop style, dynamic and high-energy mood, layered synths, punchy bass and crisp drums, mid to fast tempo, multi-section arrangement with glossy production."
+    },
+    {
+      "name": "J-Pop",
+      "prompt": "Pop instrumental music, J-Pop style, energetic and melodic mood, bright synth leads, steady drums and bass, fast tempo, structured arrangement with strong melodic emphasis."
+    }
+  ],
+  "rock": [
+    {
+      "name": "Alternative Rock",
+      "prompt": "Rock instrumental music, Alternative Rock style, intense and edgy mood, distorted guitars, bass and drums, mid-tempo rhythm, dynamic structure with raw modern production."
+    },
+    {
+      "name": "Indie Rock",
+      "prompt": "Rock instrumental music, Indie Rock style, relaxed and cool mood, clean or lightly driven guitars, bass and drums, mid-tempo rhythm, simple structure with minimal polish."
+    },
+    {
+      "name": "Hard Rock",
+      "prompt": "Rock instrumental music, Hard Rock style, powerful and aggressive mood, heavy guitar riffs, bass and punchy drums, mid-tempo groove, riff-driven structure with strong impact."
+    },
+    {
+      "name": "Progressive Rock",
+      "prompt": "Rock instrumental music, Progressive Rock style, expansive and complex mood, layered guitars, bass and drums, varied tempo and time signatures, extended multi-section structure."
+    },
+    {
+      "name": "Psychedelic Rock",
+      "prompt": "Rock instrumental music, Psychedelic Rock style, dreamy and experimental mood, effects-heavy guitars, bass and drums, mid-tempo groove, extended flowing structure with spacious production."
+    },
+    {
+      "name": "Classic Rock",
+      "prompt": "Rock instrumental music, Classic Rock style, confident and energetic mood, guitar-driven rhythm section, bass and drums, mid-tempo rhythm, verse-chorus structure with warm analog feel."
+    },
+    {
+      "name": "Soft Rock",
+      "prompt": "Rock instrumental music, Soft Rock style, smooth and relaxed mood, clean guitars, warm bass and gentle drums, slow to mid-tempo rhythm, mellow song structure with polished production."
+    },
+    {
+      "name": "Pop Rock",
+      "prompt": "Rock instrumental music, Pop Rock style, upbeat and accessible mood, polished guitars, steady drums and bass, mid-tempo rhythm, catchy hook-based structure with clean production."
+    },
+    {
+      "name": "Garage Rock",
+      "prompt": "Rock instrumental music, Garage Rock style, raw and energetic mood, distorted guitars, bass and fast drums, fast tempo, short repetitive structure with lo-fi production."
+    },
+    {
+      "name": "Post-Rock",
+      "prompt": "Rock instrumental music, Post-Rock style, atmospheric and cinematic mood, layered guitars, bass and drums, slow to mid-tempo builds, long-form structure with crescendos and spacious production."
+    }
+  ],
+  "metal": [
+    {
+      "name": "Heavy Metal",
+      "prompt": "Metal instrumental music, Heavy Metal style, powerful and anthemic mood, driving riffs, melodic leads and strong drums, fast tempo, structured song form with clear themes."
+    },
+    {
+      "name": "Thrash Metal",
+      "prompt": "Metal instrumental music, Thrash Metal style, aggressive and fast-paced mood, sharp riffing guitars, tight bass and rapid drums, very fast tempo, relentless riff-driven structure."
+    },
+    {
+      "name": "Death Metal",
+      "prompt": "Metal instrumental music, Death Metal style, brutal and intense mood, heavily distorted guitars, deep bass and blast-beat drums, extremely fast tempo, complex aggressive structure."
+    },
+    {
+      "name": "Black Metal",
+      "prompt": "Metal instrumental music, Black Metal style, dark and cold mood, tremolo-picked guitars, fast drums and atmospheric textures, very fast tempo, raw repetitive structure with spacious reverb."
+    },
+    {
+      "name": "Power Metal",
+      "prompt": "Metal instrumental music, Power Metal style, uplifting and heroic mood, melodic guitars, driving double-kick drums and bright leads, fast tempo, epic structured arrangement."
+    },
+    {
+      "name": "Doom Metal",
+      "prompt": "Metal instrumental music, Doom Metal style, heavy and ominous mood, slow crushing riffs, thick bass and heavy drums, very slow tempo, minimal structure with sustained intensity."
+    },
+    {
+      "name": "Progressive Metal",
+      "prompt": "Metal instrumental music, Progressive Metal style, complex and technical mood, intricate riffs and tight rhythms, varied tempo and odd meters, multi-section structure with precise production."
+    },
+    {
+      "name": "Nu Metal",
+      "prompt": "Metal instrumental music, Nu Metal style, aggressive and rhythmic mood, downtuned guitars, heavy drums and thick bass, mid-tempo groove, repetitive structure with modern punchy production."
+    },
+    {
+      "name": "Metalcore",
+      "prompt": "Metal instrumental music, Metalcore style, intense and dynamic mood, heavy riffs and fast drums with breakdown sections, fast tempo with rhythmic drops, modern tight production."
+    },
+    {
+      "name": "Symphonic Metal",
+      "prompt": "Metal instrumental music, Symphonic Metal style, epic and cinematic mood, heavy guitars, drums and layered orchestral textures, mid to fast tempo, grand structured arrangement with wide production."
+    }
+  ],
+  "punk": [
+    {
+      "name": "Punk Rock",
+      "prompt": "Punk instrumental music, Punk Rock style, energetic and raw mood, simple power-chord riffs, bass and fast drums, very fast tempo, short repetitive structure with minimal polish."
+    },
+    {
+      "name": "Hardcore Punk",
+      "prompt": "Punk instrumental music, Hardcore Punk style, aggressive and intense mood, heavily distorted guitars, bass and extremely fast drums, extremely fast tempo, chaotic short structure with harsh production."
+    },
+    {
+      "name": "Pop Punk",
+      "prompt": "Punk instrumental music, Pop Punk style, upbeat and melodic mood, bright distorted guitars, bass and fast drums, fast tempo, catchy song structure with clean production."
+    },
+    {
+      "name": "Post-Punk",
+      "prompt": "Punk instrumental music, Post-Punk style, dark and moody mood, angular guitars, driving bass and steady drums, mid-tempo rhythm, repetitive atmospheric structure with dry production."
+    },
+    {
+      "name": "Anarcho-Punk",
+      "prompt": "Punk instrumental music, Anarcho-Punk style, confrontational and raw mood, distorted guitars, bass and aggressive drums, fast tempo, repetitive structure with DIY lo-fi production."
+    },
+    {
+      "name": "Street Punk",
+      "prompt": "Punk instrumental music, Street Punk style, gritty and anthemic mood, distorted guitars, bass and pounding drums, fast tempo, singalong-style repetitive structure with raw production."
+    },
+    {
+      "name": "Oi",
+      "prompt": "Punk instrumental music, Oi style, rough and communal mood, simple riffs, bass and heavy drums, mid to fast tempo, repetitive chant-like structure with raw production."
+    },
+    {
+      "name": "Crust Punk",
+      "prompt": "Punk instrumental music, Crust Punk style, dark and heavy mood, distorted guitars, bass and d-beat drums, fast tempo, raw aggressive structure with harsh lo-fi production."
+    },
+    {
+      "name": "Ska Punk",
+      "prompt": "Punk instrumental music, Ska Punk style, energetic and playful mood, fast drums, offbeat guitars, bass and brass accents, fast tempo, upbeat repetitive structure with bright production."
+    },
+    {
+      "name": "Folk Punk",
+      "prompt": "Punk instrumental music, Folk Punk style, raw and energetic mood, acoustic guitar with fast drums and bass, fast tempo, simple repetitive structure with lo-fi production."
+    }
+  ],
+  "folk": [
+    {
+      "name": "Contemporary Folk",
+      "prompt": "Folk instrumental music, Contemporary Folk style, warm and reflective mood, acoustic guitar and light percussion, slow to mid-tempo rhythm, song-oriented structure with clean acoustic production."
+    },
+    {
+      "name": "Folk Rock",
+      "prompt": "Folk instrumental music, Folk Rock style, energetic and melodic mood, acoustic and electric guitars with bass and drums, mid-tempo rhythm, structured song form with warm live feel."
+    },
+    {
+      "name": "Indie Folk",
+      "prompt": "Folk instrumental music, Indie Folk style, intimate and atmospheric mood, layered acoustic instruments and subtle percussion, slow tempo, minimal structure with soft airy production."
+    },
+    {
+      "name": "Traditional Folk",
+      "prompt": "Folk instrumental music, Traditional Folk style, authentic and rooted mood, traditional acoustic instruments, mid-tempo rhythm, repetitive song form with natural recording."
+    },
+    {
+      "name": "Americana",
+      "prompt": "Folk instrumental music, Americana style, grounded and narrative mood, acoustic guitar, bass and subtle percussion, mid-tempo groove, song structure with organic production."
+    },
+    {
+      "name": "Singer-Songwriter",
+      "prompt": "Folk instrumental music, Singer-Songwriter style, introspective and personal mood, solo acoustic guitar or piano, slow tempo, simple intimate structure with close recording."
+    },
+    {
+      "name": "Anti-Folk",
+      "prompt": "Folk instrumental music, Anti-Folk style, quirky and raw mood, acoustic instruments with rough edges, mid-tempo rhythm, simple unconventional structure with lo-fi character."
+    },
+    {
+      "name": "Freak Folk",
+      "prompt": "Folk instrumental music, Freak Folk style, dreamy and experimental mood, acoustic instruments with unusual textures, slow tempo, free-flowing structure with spacious production."
+    },
+    {
+      "name": "Neofolk",
+      "prompt": "Folk instrumental music, Neofolk style, dark and atmospheric mood, acoustic strings, drones and minimal percussion, slow tempo, minimal ceremonial structure with moody production."
+    },
+    {
+      "name": "Celtic",
+      "prompt": "Folk instrumental music, Celtic style, lively and traditional mood, fiddle, flute and acoustic strings, mid to fast tempo, dance-oriented repetitive structure with natural room sound."
+    }
+  ],
+  "country": [
+    {
+      "name": "Country Pop",
+      "prompt": "Country instrumental music, Country Pop style, upbeat and polished mood, acoustic guitars, steady drums and bass, mid-tempo rhythm, catchy hook-based structure with clean production."
+    },
+    {
+      "name": "Outlaw Country",
+      "prompt": "Country instrumental music, Outlaw Country style, raw and honest mood, acoustic guitar, bass and drums, mid-tempo groove, simple structure with minimal polish and dry tone."
+    },
+    {
+      "name": "Country Rock",
+      "prompt": "Country instrumental music, Country Rock style, energetic and driving mood, electric guitars with bass and drums, mid-tempo rhythm, rock-influenced song structure with warm production."
+    },
+    {
+      "name": "Bluegrass",
+      "prompt": "Country instrumental music, Bluegrass style, lively and virtuosic mood, acoustic guitar, banjo, fiddle and upright bass, fast tempo, fast-picked repetitive structure with bright acoustic recording."
+    },
+    {
+      "name": "Honky Tonk",
+      "prompt": "Country instrumental music, Honky Tonk style, upbeat and dance-focused mood, twangy electric guitar, bass and drums, mid-tempo shuffle, simple repetitive structure with bright barroom feel."
+    },
+    {
+      "name": "Country Blues",
+      "prompt": "Country instrumental music, Country Blues style, rustic and expressive mood, acoustic guitar with simple bass support, slow to mid-tempo groove, straightforward structure with natural recording."
+    },
+    {
+      "name": "Alt-Country",
+      "prompt": "Country instrumental music, Alt-Country style, reflective and alternative mood, acoustic and electric guitars, bass and drums, mid-tempo rhythm, loose song structure with understated production."
+    },
+    {
+      "name": "Bro-Country",
+      "prompt": "Country instrumental music, Bro-Country style, bold and energetic mood, electric guitars, heavy drums and strong bass, mid-tempo groove, repetitive anthemic structure with modern polish."
+    },
+    {
+      "name": "Western Swing",
+      "prompt": "Country instrumental music, Western Swing style, upbeat and swinging mood, guitars, bass, drums and melodic leads, fast tempo, dance-oriented structure with bright lively production."
+    },
+    {
+      "name": "Americana",
+      "prompt": "Country instrumental music, Americana style, thoughtful and grounded mood, acoustic guitar, bass and light percussion, mid-tempo groove, narrative structure with organic production."
+    }
+  ],
+  "latin": [
+    {
+      "name": "Reggaeton",
+      "prompt": "Latin instrumental music, Reggaeton style, energetic and urban mood, dembow rhythm with electronic drums, deep bass and sparse melodic hooks, mid-tempo groove, repetitive club-oriented structure with modern production."
+    },
+    {
+      "name": "Salsa",
+      "prompt": "Latin instrumental music, Salsa style, vibrant and joyful mood, congas, timbales and percussion with bass and brass lines, fast syncopated rhythm, dance-oriented structure with bright live feel."
+    },
+    {
+      "name": "Bachata",
+      "prompt": "Latin instrumental music, Bachata style, romantic and smooth mood, guitar-led melody with bass and soft percussion, mid-tempo rhythm, flowing song structure with clean warm production."
+    },
+    {
+      "name": "Merengue",
+      "prompt": "Latin instrumental music, Merengue style, festive and high-energy mood, fast percussion, driving bass and bright melodic leads, very fast tempo, highly repetitive dance structure with punchy production."
+    },
+    {
+      "name": "Cumbia",
+      "prompt": "Latin instrumental music, Cumbia style, relaxed and rhythmic mood, steady percussion groove, bass and melodic instruments, mid-tempo rhythm, repetitive dance structure with warm production."
+    },
+    {
+      "name": "Latin Pop",
+      "prompt": "Latin instrumental music, Latin Pop style, bright and catchy mood, modern drums, bass and melodic hooks, mid-tempo rhythm, pop song structure with polished production."
+    },
+    {
+      "name": "Bossa Nova",
+      "prompt": "Latin instrumental music, Bossa Nova style, calm and sophisticated mood, nylon-string guitar, soft percussion and warm bass, slow to mid-tempo rhythm, gentle flowing structure with intimate production."
+    },
+    {
+      "name": "Tango",
+      "prompt": "Latin instrumental music, Tango style, dramatic and tense mood, bandoneon-like lead textures, bass and strings, mid-tempo pulse, structured phrases with sharp accents and intimate room sound."
+    },
+    {
+      "name": "Mariachi",
+      "prompt": "Latin instrumental music, Mariachi style, festive and bold mood, trumpets and strings with bass support, mid-tempo rhythm, ceremonial repetitive structure with bright acoustic production."
+    },
+    {
+      "name": "Latin Rock",
+      "prompt": "Latin instrumental music, Latin Rock style, energetic and driving mood, electric guitars, bass and drum kit with Latin percussion accents, mid-tempo groove, song-oriented structure with punchy production."
+    }
+  ],
+  "reggae": [
+    {
+      "name": "Roots Reggae",
+      "prompt": "Reggae instrumental music, Roots Reggae style, calm and reflective mood, offbeat guitar, deep melodic bass and steady drums, slow tempo one-drop rhythm, spacious groove-based structure with warm production."
+    },
+    {
+      "name": "Dub",
+      "prompt": "Reggae instrumental music, Dub style, hypnotic and atmospheric mood, heavy bass, sparse drums and rhythmic echoes, slow tempo, minimal structure with strong delay and reverb space."
+    },
+    {
+      "name": "Dancehall",
+      "prompt": "Reggae instrumental music, Dancehall style, energetic and upbeat mood, electronic drums, strong bass and rhythmic synth accents, mid-tempo groove, repetitive club-oriented structure with clean modern production."
+    },
+    {
+      "name": "Ska",
+      "prompt": "Reggae instrumental music, Ska style, lively and upbeat mood, offbeat guitar, walking bass, fast drums and bright horn lines, fast tempo, energetic repetitive structure with tight production."
+    },
+    {
+      "name": "Rocksteady",
+      "prompt": "Reggae instrumental music, Rocksteady style, smooth and romantic mood, warm bass, offbeat guitar and soft drums, slow tempo, relaxed groove structure with intimate production."
+    },
+    {
+      "name": "Lovers Rock",
+      "prompt": "Reggae instrumental music, Lovers Rock style, tender and soulful mood, soft drums, warm bass and gentle chord keys, slow tempo, smooth flowing structure with warm polished production."
+    },
+    {
+      "name": "Ragga",
+      "prompt": "Reggae instrumental music, Ragga style, energetic and digital mood, electronic drums, bass and bright rhythmic synth textures, fast tempo, repetitive structure with modern punchy production."
+    },
+    {
+      "name": "Reggae Fusion",
+      "prompt": "Reggae instrumental music, Reggae Fusion style, upbeat and crossover mood, reggae rhythm with modern drums and guitars, mid-tempo groove, song-oriented structure with clean production."
+    },
+    {
+      "name": "Reggae Rock",
+      "prompt": "Reggae instrumental music, Reggae Rock style, energetic and driving mood, rock drum kit with reggae guitar rhythm, bass and electric guitars, mid-tempo groove, song-based structure with punchy production."
+    },
+    {
+      "name": "Digital Reggae",
+      "prompt": "Reggae instrumental music, Digital Reggae style, modern and electronic mood, digital drums, synth bass and effects, mid-tempo rhythm, loop-based structure with clean electronic production."
+    }
+  ],
+  "world": [
+    {
+      "name": "African Music",
+      "prompt": "World instrumental music, African Music style, energetic and communal mood, polyrhythmic percussion, bass and melodic instruments, mid-tempo groove, repetitive call-and-response feel with organic live production."
+    },
+    {
+      "name": "Middle Eastern Music",
+      "prompt": "World instrumental music, Middle Eastern Music style, expressive and hypnotic mood, plucked strings, hand percussion and sustained drones, slow to mid-tempo pulse, modal melodic lines with dry intimate production."
+    },
+    {
+      "name": "Indian Music",
+      "prompt": "World instrumental music, Indian Music style, meditative and intricate mood, sustained drone, plucked strings and hand percussion, slow evolving tempo, long-form structure with gradual development and clean acoustic recording."
+    },
+    {
+      "name": "East Asian Music",
+      "prompt": "World instrumental music, East Asian Music style, calm and restrained mood, delicate plucked strings, flutes and soft percussion, slow tempo, minimal structure with spacious natural room sound."
+    },
+    {
+      "name": "Celtic",
+      "prompt": "World instrumental music, Celtic style, lively and melodic mood, fiddle, flute and acoustic strings, mid to fast tempo, dance-oriented repetitive structure with natural acoustic production."
+    },
+    {
+      "name": "Flamenco",
+      "prompt": "World instrumental music, Flamenco style, passionate and intense mood, rhythmic acoustic guitar, hand claps and percussion, fast complex rhythm, expressive repeated phrases with dry close production."
+    },
+    {
+      "name": "Fado",
+      "prompt": "World instrumental music, Fado style, melancholic and intimate mood, acoustic guitar textures with soft bass, slow tempo, simple lyrical phrasing in a close warm recording."
+    },
+    {
+      "name": "Klezmer",
+      "prompt": "World instrumental music, Klezmer style, joyful and expressive mood, clarinet-like melodic lead with strings and rhythm, mid-tempo dance pulse, celebratory repetitive structure with bright acoustic production."
+    },
+    {
+      "name": "Balkan Music",
+      "prompt": "World instrumental music, Balkan Music style, energetic and complex mood, brass and percussion with driving bass, fast uneven rhythmic patterns, dance-oriented repetitive structure with lively production."
+    },
+    {
+      "name": "Nordic Folk",
+      "prompt": "World instrumental music, Nordic Folk style, haunting and atmospheric mood, fiddle and acoustic instruments with sustained tones, slow to mid-tempo pulse, spacious repetitive structure with natural ambience."
+    }
+  ]
+}

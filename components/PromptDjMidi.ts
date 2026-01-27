@@ -6,6 +6,7 @@ import { css, html, LitElement } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
 import { classMap } from 'lit/directives/class-map.js';
+import { repeat } from 'lit/directives/repeat.js';
 
 import { throttle } from '../utils/throttle';
 
@@ -59,21 +60,19 @@ export class PromptDjMidi extends LitElement {
     }
     #center-circle {
       position: absolute;
-      width: 8vmin;
-      height: 8vmin;
+      width: 2.5vmin;
+      height: 2.5vmin;
       border-radius: 50%;
-      background: rgba(255, 255, 255, 0.8);
-      border: 2px solid #fff;
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.9);
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
       z-index: 10;
-      box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
       cursor: pointer;
-      transition: transform 0.2s, box-shadow 0.2s;
+      transition: transform 0.2s, border-color 0.2s;
       &:hover {
         transform: translate(-50%, -50%) scale(1.1);
-        box-shadow: 0 0 30px rgba(255, 255, 255, 0.7);
       }
       &:active {
         transform: translate(-50%, -50%) scale(0.95);
@@ -81,12 +80,18 @@ export class PromptDjMidi extends LitElement {
     }
     .genre-item {
       position: absolute;
-      padding: 0.3vmin 0.6vmin;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-sizing: border-box;
+      padding: 0.3vmin 0.5vmin;
       border-radius: 2vmin;
       font-size: 1.2vmin;
       font-weight: 500;
       text-align: center;
       white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
       user-select: none;
       cursor: pointer;
       transition: opacity 0.2s, transform 0.2s;
@@ -306,6 +311,8 @@ export class PromptDjMidi extends LitElement {
   @state() private isDragging = false;
   @state() private dragStartX = 0;
   @state() private dragStartY = 0;
+  /** Ring offsets of all circles at drag start, so we can move all circles together by the same delta */
+  private dragStartRingOffsets: { x: number; y: number }[] = [];
   @state() private containerSize = 0;
   @state() private showDebugPanel = false;
   @state() private volume = 1.0;
@@ -383,7 +390,27 @@ export class PromptDjMidi extends LitElement {
       this.ringOffsetY = activeCircle.ringOffsetY;
       this.prompts = activeCircle.prompts;
       this.disabledGenres = activeCircle.disabledGenres;
+      // Derive subgenre view from active circle's prompts
+      const first = activeCircle.prompts.values().next().value;
+      if (first?.promptId.startsWith('sub-')) {
+        const match = first.promptId.match(/^sub-(.+?)-\d+$/);
+        this.selectedMainGenreId = match ? match[1] : null;
+        this.showingSubGenres = !!this.selectedMainGenreId;
+      } else {
+        this.showingSubGenres = false;
+        this.selectedMainGenreId = null;
+      }
     }
+  }
+
+  /** Speichert die aktuelle Position des aktiven Kreises im Stack (damit sie beim Zurückspringen wieder erscheint). */
+  private persistActiveCirclePosition() {
+    if (this.activeCircleIndex < 0 || this.activeCircleIndex >= this.genreCircleStack.length) return;
+    this.genreCircleStack = this.genreCircleStack.map((circle, i) =>
+      i === this.activeCircleIndex
+        ? { ...circle, ringOffsetX: this.ringOffsetX, ringOffsetY: this.ringOffsetY }
+        : circle
+    );
   }
 
   private getActiveCircle(): GenreCircle | null {
@@ -596,19 +623,49 @@ export class PromptDjMidi extends LitElement {
     this.selectedMainGenreId = mainGenre.id;
     this.showingSubGenres = true;
     
-    // Replace prompts temporarily
     this.prompts = newSubPrompts;
+    const activeCircle = this.getActiveCircle();
+    if (!activeCircle) {
+      this.requestUpdate();
+      this.updateWeightsFromPosition();
+      return;
+    }
+    // Stack aktualisieren, damit renderGenres() die Sub-Genres mit Namen anzeigt
+    const radius = this.containerSize > 0 ? this.containerSize * 0.35 : 200;
+    // Ring so positionieren, dass das Main-Genre mit dem höchsten Mix-% (das geöffnete) im Sub-Ring in der Mitte liegt
+    const mainGenres = mainGenresData as any[];
+    const mainIndex = mainGenres.findIndex((g: any) => g.id === mainGenre.id);
+    const nMain = mainGenres.length;
+    const alpha = mainIndex >= 0 && nMain > 0
+      ? (mainIndex * (Math.PI * 2) / nMain) - (Math.PI / 2)
+      : -Math.PI / 2;
+    const offX = -radius * Math.cos(alpha);
+    const offY = -radius * Math.sin(alpha);
+    this.ringOffsetX = offX;
+    this.ringOffsetY = offY;
+    const updatedStack = [...this.genreCircleStack];
+    updatedStack[this.activeCircleIndex] = {
+      ...activeCircle,
+      prompts: new Map(newSubPrompts),
+      ringOffsetX: offX,
+      ringOffsetY: offY,
+    };
+    this.genreCircleStack = updatedStack;
     this.requestUpdate();
-    
-    // Update weights
     this.updateWeightsFromPosition();
   }
 
   private handleBackToMainGenres() {
     this.showingSubGenres = false;
     this.selectedMainGenreId = null;
-    // Restore original prompts
-    this.prompts = new Map(this.originalPrompts);
+    const orig = new Map(this.originalPrompts);
+    this.prompts = orig;
+    const activeCircle = this.getActiveCircle();
+    if (activeCircle) {
+      const updatedStack = [...this.genreCircleStack];
+      updatedStack[this.activeCircleIndex] = { ...activeCircle, prompts: orig };
+      this.genreCircleStack = updatedStack;
+    }
     this.requestUpdate();
     this.updateWeightsFromPosition();
   }
@@ -624,30 +681,96 @@ export class PromptDjMidi extends LitElement {
     return `#${f(0)}${f(8)}${f(4)}`;
   }
 
+  /** Gewichtete Mischfarbe aus allen Prompts – für die Center-Outline. */
+  private getMixColor(): string {
+    let totalWeight = 0;
+    let r = 0, g = 0, b = 0;
+    for (const p of this.prompts.values()) {
+      if (p.weight <= 0) continue;
+      const hex = p.color.replace(/^#/, '');
+      if (hex.length !== 6) continue;
+      const pr = parseInt(hex.slice(0, 2), 16);
+      const pg = parseInt(hex.slice(2, 4), 16);
+      const pb = parseInt(hex.slice(4, 6), 16);
+      r += pr * p.weight;
+      g += pg * p.weight;
+      b += pb * p.weight;
+      totalWeight += p.weight;
+    }
+    if (totalWeight <= 0) return 'rgba(255, 255, 255, 0.6)';
+    r = Math.round(r / totalWeight);
+    g = Math.round(g / totalWeight);
+    b = Math.round(b / totalWeight);
+    return `rgb(${r}, ${g}, ${b})`;
+  }
+
   private handleCenterCircleClick(e: MouseEvent | TouchEvent) {
     e.stopPropagation();
     e.preventDefault();
     this.createNewGenreCircle();
   }
 
+  /** Main genre ID that has the highest weight in the current mix (from active circle). */
+  private getMainGenreIdWithHighestWeight(): string | null {
+    const activeCircle = this.getActiveCircle();
+    if (!activeCircle) return null;
+    let bestId: string | null = null;
+    let bestWeight = -1;
+    for (const p of activeCircle.prompts.values()) {
+      if (p.weight <= bestWeight) continue;
+      let mainId: string | null = null;
+      if (p.promptId.startsWith('prompt-')) {
+        mainId = p.promptId.slice('prompt-'.length);
+      } else if (p.promptId.startsWith('sub-')) {
+        const m = p.promptId.match(/^sub-(.+?)-\d+$/);
+        mainId = m ? m[1] : null;
+      }
+      if (mainId) {
+        bestWeight = p.weight;
+        bestId = mainId;
+      }
+    }
+    return bestId;
+  }
+
   private createNewGenreCircle() {
     const activeCircle = this.getActiveCircle();
     if (!activeCircle || activeCircle.isExpanding) return;
     
-    // Create a new genre circle at the current center position
-    // The center is always at containerSize / 2, so the new circle starts there
+    // New circle shows subgenres of the genre with highest % in the current mix (if any)
+    const mainId = this.getMainGenreIdWithHighestWeight();
+    const subGenres = mainId ? (subGenresData as any)[mainId] as { name: string; prompt: string }[] | undefined : undefined;
+    const mainGenres = mainGenresData as any[];
+    const mainGenre = mainId ? mainGenres.find((g: any) => g.id === mainId) : null;
+    
+    let initialPrompts: Map<string, Prompt>;
+    if (mainGenre && subGenres && subGenres.length > 0) {
+      initialPrompts = new Map<string, Prompt>();
+      subGenres.forEach((subGenre: any, index: number) => {
+        const subPromptId = `sub-${mainGenre.id}-${index}`;
+        initialPrompts.set(subPromptId, {
+          promptId: subPromptId,
+          text: subGenre.prompt,
+          weight: 0,
+          cc: index,
+          color: this.hslToHex(mainGenre.colorHue, 100, 50),
+        });
+      });
+    } else {
+      initialPrompts = new Map(this.originalPrompts);
+    }
+    
     const newCircleId = `circle-${this.genreCircleStack.length}`;
     const newCircle: GenreCircle = {
       id: newCircleId,
-      prompts: new Map(this.originalPrompts), // Start with original prompts
-      ringOffsetX: 0, // New circle starts centered at the fixed center point
+      prompts: initialPrompts,
+      ringOffsetX: 0,
       ringOffsetY: 0,
       disabledGenres: new Set(),
       isExpanding: true,
       expansionProgress: 0,
     };
     
-    // Add to stack and make it active
     this.genreCircleStack = [...this.genreCircleStack, newCircle];
     this.activeCircleIndex = this.genreCircleStack.length - 1;
     
@@ -698,6 +821,7 @@ export class PromptDjMidi extends LitElement {
 
   private navigateBack() {
     if (this.activeCircleIndex > 0) {
+      this.persistActiveCirclePosition();
       this.activeCircleIndex--;
       this.syncActiveCircleState();
       this.updateWeightsFromPosition();
@@ -707,6 +831,7 @@ export class PromptDjMidi extends LitElement {
 
   private navigateToCircle(index: number) {
     if (index >= 0 && index < this.genreCircleStack.length) {
+      this.persistActiveCirclePosition();
       this.activeCircleIndex = index;
       this.syncActiveCircleState();
       this.updateWeightsFromPosition();
@@ -733,9 +858,13 @@ export class PromptDjMidi extends LitElement {
       }
     }
     
-    // Start dragging the active genre ring only
+    // Start dragging: all circles will move together (pan the map)
     if (container) {
       this.isDragging = true;
+      this.dragStartRingOffsets = this.genreCircleStack.map((c) => ({
+        x: c.ringOffsetX,
+        y: c.ringOffsetY,
+      }));
       const rect = container.getBoundingClientRect();
       const clientX = 'clientX' in e ? e.clientX : (e as TouchEvent).touches[0].clientX;
       const clientY = 'clientY' in e ? e.clientY : (e as TouchEvent).touches[0].clientY;
@@ -762,24 +891,30 @@ export class PromptDjMidi extends LitElement {
     const containerCenterX = this.containerSize / 2;
     const containerCenterY = this.containerSize / 2;
     
-    // Calculate new ring offset
+    // New offset from cursor (for the active circle)
     const newOffsetX = clientX - rect.left - containerCenterX - this.dragStartX;
     const newOffsetY = clientY - rect.top - containerCenterY - this.dragStartY;
-    
-    // Constrain ring movement to keep genres visible (optional: can be removed for unlimited movement)
     const maxOffset = this.containerSize * 0.4;
-    this.ringOffsetX = Math.max(-maxOffset, Math.min(maxOffset, newOffsetX));
-    this.ringOffsetY = Math.max(-maxOffset, Math.min(maxOffset, newOffsetY));
+    const nextOffsetX = Math.max(-maxOffset, Math.min(maxOffset, newOffsetX));
+    const nextOffsetY = Math.max(-maxOffset, Math.min(maxOffset, newOffsetY));
+    this.ringOffsetX = nextOffsetX;
+    this.ringOffsetY = nextOffsetY;
     
-    // Update active circle's position
-    const activeCircle = this.getActiveCircle();
-    if (activeCircle) {
-      const updatedStack = [...this.genreCircleStack];
-      updatedStack[this.activeCircleIndex] = {
-        ...activeCircle,
-        ringOffsetX: this.ringOffsetX,
-        ringOffsetY: this.ringOffsetY,
-      };
+    // Move all circles by the same delta so the whole map pans together (no "wall" pushing inactives to one spot)
+    // Only the active circle is clamped to maxOffset; others follow the delta without clamping so they don't pile up
+    const startOffsets = this.dragStartRingOffsets;
+    if (startOffsets.length > 0 && this.activeCircleIndex >= 0 && this.activeCircleIndex < startOffsets.length) {
+      const deltaX = nextOffsetX - startOffsets[this.activeCircleIndex].x;
+      const deltaY = nextOffsetY - startOffsets[this.activeCircleIndex].y;
+      const updatedStack = this.genreCircleStack.map((circle, i) => {
+        const x = startOffsets[i].x + deltaX;
+        const y = startOffsets[i].y + deltaY;
+        return {
+          ...circle,
+          ringOffsetX: i === this.activeCircleIndex ? nextOffsetX : x,
+          ringOffsetY: i === this.activeCircleIndex ? nextOffsetY : y,
+        };
+      });
       this.genreCircleStack = updatedStack;
     }
     
@@ -814,6 +949,9 @@ export class PromptDjMidi extends LitElement {
   private handleTouchEnd() {
     this.handlePointerUp();
   }
+
+  /** Vorerst deaktiviert – Lichtblobs im Hintergrund (Code bleibt erhalten). */
+  private readonly backgroundBlobsEnabled = false;
 
   /** Generates radial gradients for each prompt based on weight and color. */
   private readonly makeBackground = throttle(
@@ -864,14 +1002,15 @@ export class PromptDjMidi extends LitElement {
 
   override render() {
     const bg = styleMap({
-      backgroundImage: this.makeBackground(),
+      backgroundImage: this.backgroundBlobsEnabled ? this.makeBackground() : 'none',
     });
     
-    // Center circle is always fixed at container center
+    // Center circle: Position fix, Outline-Farbe = aktueller Mix
     const centerCircleStyle = styleMap({
       left: '50%',
       top: '50%',
       transform: 'translate(-50%, -50%)',
+      borderColor: this.getMixColor(),
     });
     
     return html`<div id="background" style=${bg}></div>
@@ -1035,71 +1174,76 @@ export class PromptDjMidi extends LitElement {
   private renderGenres() {
     const radius = this.containerSize > 0 ? (this.containerSize * 0.35) : 200;
     
-    // Render genres for all circles, but only make the active one interactive
-    return this.genreCircleStack.map((circle, circleIndex) => {
-      const isActive = circleIndex === this.activeCircleIndex;
+    // Build flat list of genre items with unique key per circle+prompt so inactive circles
+    // keep their own DOM nodes and positions (do not move when active circle is dragged)
+    const items: { key: string; circle: GenreCircle; circleIndex: number; prompt: Prompt; index: number; total: number }[] = [];
+    this.genreCircleStack.forEach((circle, circleIndex) => {
       const promptArray = [...circle.prompts.values()];
-      
-      return promptArray.map((prompt, index) => {
-        const pos = this.getGenrePositionForCircle(index, promptArray.length, radius, circle);
-        // Convert angle from radians to degrees
+      promptArray.forEach((prompt, index) => {
+        items.push({
+          key: `${circle.id}-${prompt.promptId}`,
+          circle,
+          circleIndex,
+          prompt,
+          index,
+          total: promptArray.length,
+        });
+      });
+    });
+
+    return repeat(
+      items,
+      (item) => item.key,
+      (item) => {
+        const { circle, circleIndex, prompt, index, total } = item;
+        const isActive = circleIndex === this.activeCircleIndex;
+        const pos = this.getGenrePositionForCircle(index, total, radius, circle);
         const angleDeg = (pos.angle * 180 / Math.PI);
-        
-        // Rotate text to be tangential to the circle (perpendicular to radius)
-        // Add 90° to make it tangential
         let rotationDeg = angleDeg + 90;
-        
-        // Normalize to 0-360 range
         rotationDeg = ((rotationDeg % 360) + 360) % 360;
-        
-        // Flip text by 180° if it's on the left side (90° to 270°) to keep it readable
-        // This ensures text is always right-side up and not inverted
         if (rotationDeg > 90 && rotationDeg <= 270) {
           rotationDeg = (rotationDeg + 180) % 360;
         }
-        
-        // For inactive circles, use lower opacity and grayscale
+        const slotAngle = (Math.PI * 2) / total;
+        const boxAngle = slotAngle * 0.98;
+        const boxWidthPx = Math.max(20, 2 * radius * Math.sin(boxAngle / 2));
+        const boxHeightPx = Math.max(22, radius * 0.12);
         const baseOpacity = isActive ? (prompt.weight > 0.1 ? 1 : 0.3) : 0.2;
-        
+        const opacity = baseOpacity * circle.expansionProgress;
         const style = styleMap({
           left: `${pos.x}px`,
           top: `${pos.y}px`,
+          width: `${boxWidthPx}px`,
+          minHeight: `${boxHeightPx}px`,
           transform: `translate(-50%, -50%) rotate(${rotationDeg}deg)`,
           color: prompt.color,
-          opacity: baseOpacity,
+          opacity: `${opacity}`,
         });
-        
         const classes = classMap({
           'genre-item': true,
           'inactive': !isActive,
           'filtered': this.filteredPrompts.has(prompt.text),
           'disabled': circle.disabledGenres.has(prompt.promptId) && !this.showingSubGenres,
         });
-        
-        // Display name for genres (prompt.text contains the full prompt, but we want to show the name)
-        // For main genres: find the name from main-genres.json
-        // For sub-genres: find the name from sub-genres.json
-        let displayText = prompt.text; // Fallback to prompt text if name not found
-        
+        let displayText = prompt.text;
         if (this.showingSubGenres && this.selectedMainGenreId) {
-          // For sub-genres, extract the name from sub-genres data
-          const subGenres = (subGenresData as any)[this.selectedMainGenreId];
-          const subGenre = subGenres?.find((sg: any) => sg.prompt === prompt.text);
-          if (subGenre) {
-            displayText = subGenre.name;
+          const subGenres = (subGenresData as any)[this.selectedMainGenreId] as { name: string; prompt: string }[] | undefined;
+          if (subGenres) {
+            const match = prompt.promptId.match(/^sub-.+-(\d+)$/);
+            const idx = match ? parseInt(match[1], 10) : -1;
+            if (idx >= 0 && idx < subGenres.length) displayText = subGenres[idx].name;
+            else {
+              const byPrompt = subGenres.find((sg) => sg.prompt === prompt.text);
+              if (byPrompt) displayText = byPrompt.name;
+            }
           }
         } else {
-          // For main genres, find the name from main-genres.json by matching the prompt
           const mainGenre = (mainGenresData as any[]).find(g => g.prompt === prompt.text);
-          if (mainGenre) {
-            displayText = mainGenre.name;
-          }
+          if (mainGenre) displayText = mainGenre.name;
         }
-        
-        // Only add event handlers for active circle
         if (isActive) {
-          return html`<div 
-            class=${classes} 
+          return html`<div
+            class=${classes}
             style=${style}
             @mousedown=${(e: MouseEvent) => this.handleGenreMouseDown(prompt.promptId, e)}
             @mouseup=${this.handleGenreMouseUp}
@@ -1107,18 +1251,10 @@ export class PromptDjMidi extends LitElement {
             @touchstart=${(e: TouchEvent) => this.handleGenreTouchStart(prompt.promptId, e)}
             @touchend=${this.handleGenreTouchEnd}
             @touchcancel=${this.handleGenreTouchEnd}
-            @click=${(e: MouseEvent) => this.handleGenreClick(prompt.promptId, e)}>
-            ${displayText}
-          </div>`;
-        } else {
-          // Inactive circle - no event handlers
-          return html`<div 
-            class=${classes} 
-            style=${style}>
-            ${displayText}
-          </div>`;
+            @click=${(e: MouseEvent) => this.handleGenreClick(prompt.promptId, e)}>${displayText}</div>`;
         }
-      });
-    }).flat();
+        return html`<div class=${classes} style=${style}>${displayText}</div>`;
+      }
+    );
   }
 }

@@ -10,10 +10,24 @@ import { PromptDjMidi } from './components/PromptDjMidi';
 import { ToastMessage } from './components/ToastMessage';
 import { LiveMusicHelper } from './utils/LiveMusicHelper';
 import { AudioAnalyser } from './utils/AudioAnalyser';
+import { GeminiAgent } from './utils/GeminiAgent';
 import mainGenresData from './main-genres.json';
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY, apiVersion: 'v1alpha' });
+const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+if (!apiKey || apiKey.trim() === '') {
+  throw new Error('VITE_GEMINI_API_KEY is not set. Please create a .env.local file with VITE_GEMINI_API_KEY=your_api_key (get one at https://aistudio.google.com/apikey)');
+}
+
+const ai = new GoogleGenAI({ apiKey, apiVersion: 'v1alpha' });
 const model = 'lyria-realtime-exp';
+
+// Initialize Gemini AI Agent with the same API key
+// Genre data is automatically included in the system instruction
+export const geminiAgent = new GeminiAgent(apiKey, {
+  model: 'gemini-2.5-flash', // Use gemini-2.5-flash
+  temperature: 0.7,
+  includeGenreData: true, // Include main-genres.json and sub-genres.json in context
+});
 
 function main() {
   const initialPrompts = buildInitialPrompts();

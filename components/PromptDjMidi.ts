@@ -54,6 +54,7 @@ export class PromptDjMidi extends LitElement {
       margin-top: 8vmin;
       cursor: move;
       cursor: grab;
+      touch-action: none;
       &:active {
         cursor: grabbing;
       }
@@ -69,7 +70,7 @@ export class PromptDjMidi extends LitElement {
       z-index: 10;
       cursor: pointer;
       transition: transform 0.2s;
-      --cross-color: rgba(255, 255, 255, 0.9);
+      touch-action: none;
       &:hover {
         transform: translate(-50%, -50%) scale(1.1);
       }
@@ -80,17 +81,18 @@ export class PromptDjMidi extends LitElement {
       &::after {
         content: '';
         position: absolute;
-        background: var(--cross-color);
+        background: #FD7B2E;
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
+        border-radius: 0.1vmin;
       }
       &::before {
         width: 2.5vmin;
-        height: 0.3vmin;
+        height: 0.15vmin;
       }
       &::after {
-        width: 0.3vmin;
+        width: 0.15vmin;
         height: 2.5vmin;
       }
     }
@@ -144,10 +146,37 @@ export class PromptDjMidi extends LitElement {
       text-overflow: ellipsis;
       user-select: none;
       cursor: pointer;
-      transition: opacity 0.2s, transform 0.2s, color 0.3s;
+      transition: opacity 0.2s, transform 0.2s;
       border: none;
       background: transparent;
       transform-origin: center center;
+      touch-action: none;
+    }
+    .genre-item-svg {
+      position: absolute;
+      overflow: visible;
+      pointer-events: none;
+      user-select: none;
+    }
+    .genre-item-svg text {
+      font-family: 'Satoshi', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      pointer-events: auto;
+      transition: opacity 0.2s;
+    }
+    .genre-item-svg text.filtered {
+      opacity: 0.5;
+    }
+    .genre-item-svg text.disabled {
+      opacity: 0.2;
+      text-decoration: line-through;
+    }
+    .genre-item-svg text.inactive {
+      filter: grayscale(100%) brightness(0.6);
+      pointer-events: none;
+      cursor: default;
     }
     .genre-item.filtered {
       opacity: 0.5;
@@ -209,20 +238,48 @@ export class PromptDjMidi extends LitElement {
       pointer-events: none;
       cursor: default;
     }
+    #header {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      right: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 100;
+      pointer-events: none;
+    }
+    #header > * {
+      pointer-events: auto;
+    }
+    #header-logo {
+      height: auto;
+      flex-shrink: 0;
+    }
     #media-controls {
       position: absolute;
       bottom: 30px;
       left: 50%;
       transform: translateX(-50%);
       display: flex;
+      flex-direction: column;
       align-items: center;
-      gap: 20px;
+      gap: 12px;
       z-index: 100;
-      padding: 16px 24px;
+      padding: 12px 20px 16px 20px;
       background: rgba(0, 0, 0, 0.6);
-      border-radius: 50px;
+      border-radius: 24px;
       backdrop-filter: blur(20px);
       border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    #media-controls .presets-row {
+      display: flex;
+      gap: 6px;
+    }
+    #media-controls .controls-row {
+      display: flex;
+      align-items: center;
+      gap: 20px;
     }
     play-pause-button {
       position: relative;
@@ -253,6 +310,33 @@ export class PromptDjMidi extends LitElement {
       transform: scale(0.95);
     }
     #dice-button svg {
+      width: 28px;
+      height: 28px;
+      color: #ffffff;
+    }
+    #seed-button {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      border: 2px solid #ffffff;
+      background: transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+      padding: 0;
+      margin: 0;
+    }
+    #seed-button:hover {
+      transform: scale(1.05);
+      border-color: rgba(255, 255, 255, 0.8);
+    }
+    #seed-button:active {
+      transform: scale(0.95);
+    }
+    #seed-button svg {
       width: 28px;
       height: 28px;
       color: #ffffff;
@@ -292,11 +376,10 @@ export class PromptDjMidi extends LitElement {
       display: flex;
       align-items: center;
       gap: 12px;
-      margin-left: 20px;
     }
     #volume-icon {
-      width: 40px;
-      height: 40px;
+      width: 36px;
+      height: 36px;
       border-radius: 50%;
       border: 2px solid #ffffff;
       background: transparent;
@@ -450,8 +533,8 @@ export class PromptDjMidi extends LitElement {
       border-radius: 3px;
       outline: none;
       cursor: pointer;
-      writing-mode: bt-lr; /* IE */
-      -webkit-appearance: slider-vertical; /* WebKit */
+      writing-mode: vertical-lr;
+      direction: rtl;
     }
     #radius-slider::-webkit-slider-thumb {
       -webkit-appearance: none;
@@ -490,8 +573,8 @@ export class PromptDjMidi extends LitElement {
       user-select: none;
     }
     input[type="range"][orient="vertical"] {
-      writing-mode: bt-lr;
-      -webkit-appearance: slider-vertical;
+      writing-mode: vertical-lr;
+      direction: rtl;
     }
     #chat-container {
       margin-top: 20px;
@@ -634,6 +717,46 @@ export class PromptDjMidi extends LitElement {
       pointer-events: none;
       transform: translate(-50%, -50%);
     }
+    .circle-label {
+      position: absolute;
+      transform: translate(-50%, -50%);
+      font-size: 1.5vmin;
+      font-weight: 500;
+      color: rgba(255, 255, 255, 0.7);
+      text-align: center;
+      white-space: nowrap;
+      pointer-events: none;
+      z-index: 1;
+    }
+    .preset-slot {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      background: transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.5);
+      font-family: 'Satoshi', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      user-select: none;
+    }
+    .preset-slot:hover {
+      border-color: rgba(255, 255, 255, 0.6);
+      color: rgba(255, 255, 255, 0.8);
+    }
+    .preset-slot.saved {
+      border-color: #FD7B2E;
+      background: rgba(253, 123, 46, 0.3);
+      color: #FD7B2E;
+    }
+    .preset-slot.saved:hover {
+      background: rgba(253, 123, 46, 0.5);
+    }
   `;
 
   private prompts: Map<string, Prompt>;
@@ -669,6 +792,10 @@ export class PromptDjMidi extends LitElement {
   @state() private chatMessages: Array<{ role: 'user' | 'assistant'; content: string }> = [];
   @state() private chatInput = '';
   @state() private chatLoading = false;
+  
+  // Preset positions (keys 1-9)
+  @state() private savedPresets: Map<number, { offsetX: number; offsetY: number; radius: number; circleIndex: number }> = new Map();
+  private presetAnimationId: number | null = null;
   @state() private systemInstruction = 'You are a helpful AI assistant for music production and DJing.';
   @state() private newCircleMessageTemplate = `Take the currently active {genres}, combine them meaningfully, and generate 5 new named prompts that can be used for further mixing.
 Always respond only in the following JSON format (exactly 5 objects):
@@ -724,16 +851,28 @@ Always respond only in the following JSON format (exactly 5 objects):
     this.activeCircleIndex = 0;
   }
 
+  // Bound handlers for passive event listeners
+  private boundTouchStart = this.handleTouchStart.bind(this);
+  private boundTouchMove = this.handleTouchMove.bind(this);
+  private boundTouchEnd = this.handleTouchEnd.bind(this);
+
   override firstUpdated() {
-    this.initializeContainer();
+    // Defer initialization to next frame to avoid triggering update during update
+    requestAnimationFrame(() => this.initializeContainer());
     // Add resize observer to handle window resizing
     if (typeof ResizeObserver !== 'undefined') {
       const container = this.shadowRoot?.getElementById('radial-container');
       if (container) {
         const observer = new ResizeObserver(() => {
-          this.initializeContainer();
+          requestAnimationFrame(() => this.initializeContainer());
         });
         observer.observe(container);
+        
+        // Register touch events with passive: true to avoid scroll-blocking warnings
+        container.addEventListener('touchstart', this.boundTouchStart, { passive: true });
+        container.addEventListener('touchmove', this.boundTouchMove, { passive: true });
+        container.addEventListener('touchend', this.boundTouchEnd, { passive: true });
+        container.addEventListener('touchcancel', this.boundTouchEnd, { passive: true });
       }
     }
     // Listen for keyboard events
@@ -742,19 +881,155 @@ Always respond only in the following JSON format (exactly 5 objects):
 
   override disconnectedCallback() {
     super.disconnectedCallback();
+    // Remove passive touch listeners
+    const container = this.shadowRoot?.getElementById('radial-container');
+    if (container) {
+      container.removeEventListener('touchstart', this.boundTouchStart);
+      container.removeEventListener('touchmove', this.boundTouchMove);
+      container.removeEventListener('touchend', this.boundTouchEnd);
+      container.removeEventListener('touchcancel', this.boundTouchEnd);
+    }
     document.removeEventListener('keydown', this.handleKeyDown.bind(this));
   }
 
   private handleKeyDown(e: KeyboardEvent) {
+    // Toggle debug panel with P
     if (e.key === 'p' || e.key === 'P') {
       this.showDebugPanel = !this.showDebugPanel;
       this.requestUpdate();
+      return;
     }
+    
+    // Preset keys 1-9
+    const key = parseInt(e.key);
+    if (key >= 1 && key <= 9) {
+      e.preventDefault();
+      const activeCircle = this.getActiveCircle();
+      if (!activeCircle) return;
+      
+      if (e.shiftKey) {
+        // Shift + Number = Delete preset
+        if (this.savedPresets.has(key)) {
+          this.savedPresets.delete(key);
+          this.savedPresets = new Map(this.savedPresets); // Trigger reactivity
+          this.showPresetToast(`Preset ${key} gelöscht`);
+        }
+      } else if (this.savedPresets.has(key)) {
+        // Preset exists → Jump to saved position
+        const preset = this.savedPresets.get(key)!;
+        // Switch to saved circle if different and exists
+        if (preset.circleIndex !== this.activeCircleIndex && preset.circleIndex < this.genreCircleStack.length) {
+          this.navigateToCircle(preset.circleIndex);
+        }
+        this.animateToPreset(preset.offsetX, preset.offsetY, preset.radius);
+        this.showPresetToast(`Preset ${key} geladen`);
+      } else {
+        // Slot empty → Save current position
+        this.savedPresets.set(key, {
+          offsetX: activeCircle.ringOffsetX,
+          offsetY: activeCircle.ringOffsetY,
+          radius: activeCircle.radiusMultiplier,
+          circleIndex: this.activeCircleIndex
+        });
+        this.savedPresets = new Map(this.savedPresets); // Trigger reactivity
+        this.showPresetToast(`Preset ${key} gespeichert`);
+      }
+    }
+  }
+  
+  private showPresetToast(message: string) {
+    // Dispatch a toast event that can be caught by parent components
+    this.dispatchEvent(new CustomEvent('show-toast', { 
+      detail: { message, duration: 1500 },
+      bubbles: true,
+      composed: true
+    }));
+  }
+  
+  private handlePresetClick(num: number) {
+    const activeCircle = this.getActiveCircle();
+    if (!activeCircle) return;
+    
+    if (this.savedPresets.has(num)) {
+      // Preset exists → Jump to saved position
+      const preset = this.savedPresets.get(num)!;
+      // Switch to saved circle if different and exists
+      if (preset.circleIndex !== this.activeCircleIndex && preset.circleIndex < this.genreCircleStack.length) {
+        this.navigateToCircle(preset.circleIndex);
+      }
+      this.animateToPreset(preset.offsetX, preset.offsetY, preset.radius);
+      this.showPresetToast(`Preset ${num} geladen`);
+    } else {
+      // Slot empty → Save current position
+      this.savedPresets.set(num, {
+        offsetX: activeCircle.ringOffsetX,
+        offsetY: activeCircle.ringOffsetY,
+        radius: activeCircle.radiusMultiplier,
+        circleIndex: this.activeCircleIndex
+      });
+      this.savedPresets = new Map(this.savedPresets); // Trigger reactivity
+      this.showPresetToast(`Preset ${num} gespeichert`);
+    }
+  }
+  
+  private animateToPreset(targetOffsetX: number, targetOffsetY: number, targetRadius: number) {
+    const activeCircle = this.getActiveCircle();
+    if (!activeCircle) return;
+    
+    // Cancel any ongoing animation
+    if (this.presetAnimationId !== null) {
+      cancelAnimationFrame(this.presetAnimationId);
+    }
+    
+    const startOffsetX = activeCircle.ringOffsetX;
+    const startOffsetY = activeCircle.ringOffsetY;
+    const startRadius = activeCircle.radiusMultiplier;
+    const duration = 300; // ms
+    const startTime = performance.now();
+    
+    const animate = (currentTime: number) => {
+      const elapsed = currentTime - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      
+      // Ease-out cubic for smooth deceleration
+      const eased = 1 - Math.pow(1 - progress, 3);
+      
+      // Interpolate values
+      const newOffsetX = startOffsetX + (targetOffsetX - startOffsetX) * eased;
+      const newOffsetY = startOffsetY + (targetOffsetY - startOffsetY) * eased;
+      const newRadius = startRadius + (targetRadius - startRadius) * eased;
+      
+      // Only update the active circle (preset is for this circle only)
+      this.genreCircleStack = this.genreCircleStack.map((circle, idx) => {
+        if (idx === this.activeCircleIndex) {
+          return {
+            ...circle,
+            ringOffsetX: newOffsetX,
+            ringOffsetY: newOffsetY,
+            radiusMultiplier: newRadius
+          };
+        }
+        return circle; // Other circles remain unchanged
+      });
+      
+      this.updateWeightsFromPosition();
+      
+      if (progress < 1) {
+        this.presetAnimationId = requestAnimationFrame(animate);
+      } else {
+        this.presetAnimationId = null;
+        this.syncActiveCircleState();
+      }
+    };
+    
+    this.presetAnimationId = requestAnimationFrame(animate);
   }
 
   override updated() {
+    // Use requestAnimationFrame to defer initialization to avoid triggering
+    // a new update cycle during the current update
     if (this.containerSize === 0) {
-      this.initializeContainer();
+      requestAnimationFrame(() => this.initializeContainer());
     }
   }
 
@@ -762,7 +1037,7 @@ Always respond only in the following JSON format (exactly 5 objects):
     const container = this.shadowRoot?.getElementById('radial-container');
     if (container) {
       const newSize = container.offsetWidth;
-      if (newSize > 0) {
+      if (newSize > 0 && newSize !== this.containerSize) {
         this.containerSize = newSize;
         this.syncActiveCircleState();
         this.updateWeightsFromPosition();
@@ -871,20 +1146,49 @@ Always respond only in the following JSON format (exactly 5 objects):
     const fixedCenterX = this.containerSize / 2;
     const fixedCenterY = this.containerSize / 2;
 
-    promptArray.forEach((prompt, index) => {
+    // Get active circle for ring offset
+    const activeCircle = this.getActiveCircle();
+    const ringOffsetX = activeCircle ? activeCircle.ringOffsetX : this.ringOffsetX;
+    const ringOffsetY = activeCircle ? activeCircle.ringOffsetY : this.ringOffsetY;
+    const ringCenterX = fixedCenterX + ringOffsetX;
+    const ringCenterY = fixedCenterY + ringOffsetY;
+
+    // PASS 1: Calculate fisheye scales for all items using equal-spacing positions
+    // (same logic as renderGenres())
+    const scaleData = promptArray.map((prompt, index) => {
+      const equalAngleStep = (Math.PI * 2) / promptArray.length;
+      const equalAngle = (index * equalAngleStep) - (Math.PI / 2);
+      const genreX = ringCenterX + Math.cos(equalAngle) * radius;
+      const genreY = ringCenterY + Math.sin(equalAngle) * radius;
+      const fisheyeScale = this.calculateFisheyeScale(genreX, genreY, radius);
+      return { prompt, index, fisheyeScale };
+    });
+
+    // Calculate total scale for proportional distribution
+    const totalScale = scaleData.reduce((sum, d) => sum + d.fisheyeScale, 0);
+
+    // PASS 2: Calculate proportional angles and use mid-angle positions for weight calculation
+    let currentAngle = -Math.PI / 2; // Start at top
+
+    scaleData.forEach(({ prompt, fisheyeScale }) => {
       if (this.disabledGenres.has(prompt.promptId)) {
         prompt.weight = 0;
         newPrompts.set(prompt.promptId, prompt);
         return;
       }
 
-      const genrePos = this.getGenrePosition(index, promptArray.length, radius);
-      const distance = this.calculateDistance(
-        fixedCenterX,
-        fixedCenterY,
-        genrePos.x,
-        genrePos.y,
-      );
+      // Calculate proportional arc portion based on fisheye scale
+      const arcPortion = (fisheyeScale / totalScale) * (Math.PI * 2);
+      const startAngle = currentAngle;
+      const endAngle = currentAngle + arcPortion;
+      currentAngle = endAngle; // Update for next item
+
+      // Use mid-angle of the arc (where the text is displayed at startOffset="50%")
+      const midAngle = (startAngle + endAngle) / 2;
+      const genreX = ringCenterX + Math.cos(midAngle) * radius;
+      const genreY = ringCenterY + Math.sin(midAngle) * radius;
+
+      const distance = this.calculateDistance(fixedCenterX, fixedCenterY, genreX, genreY);
 
       // Inverse distance^exponent: closer genre to fixed center → stronger influence
       // When directly overlapping (distance ≈ 0), only that genre is active
@@ -957,13 +1261,27 @@ Always respond only in the following JSON format (exactly 5 objects):
       return;
     }
     
-    // Toggle disabled state for main genres only
     const newDisabledGenres = new Set(this.disabledGenres);
-    if (newDisabledGenres.has(promptId)) {
-      newDisabledGenres.delete(promptId);
+    
+    // Shift+Click: Select only this genre, disable all others
+    if (e.shiftKey) {
+      // Disable all genres except the clicked one
+      for (const prompt of this.prompts.values()) {
+        if (prompt.promptId === promptId) {
+          newDisabledGenres.delete(promptId);
+        } else {
+          newDisabledGenres.add(prompt.promptId);
+        }
+      }
     } else {
-      newDisabledGenres.add(promptId);
+      // Normal click: Toggle disabled state for this genre
+      if (newDisabledGenres.has(promptId)) {
+        newDisabledGenres.delete(promptId);
+      } else {
+        newDisabledGenres.add(promptId);
+      }
     }
+    
     this.disabledGenres = newDisabledGenres;
     
     // Update active circle's disabled genres
@@ -1328,7 +1646,7 @@ Always respond only in the following JSON format (exactly 5 objects):
       const containerCenterY = this.containerSize / 2;
       this.dragStartX = clientX - rect.left - containerCenterX - this.ringOffsetX;
       this.dragStartY = clientY - rect.top - containerCenterY - this.ringOffsetY;
-      e.preventDefault();
+      // touch-action: none in CSS prevents default scroll behavior
     }
   }
 
@@ -1376,7 +1694,7 @@ Always respond only in the following JSON format (exactly 5 objects):
     
     this.updateWeightsFromPosition();
     this.requestUpdate(); // Force update to move the center label with the circle
-    e.preventDefault();
+    // touch-action: none in CSS prevents default scroll behavior
   }
 
   private handlePointerUp() {
@@ -1396,6 +1714,25 @@ Always respond only in the following JSON format (exactly 5 objects):
   }
 
   private handleTouchStart(e: TouchEvent) {
+    const target = e.target as HTMLElement;
+    
+    // Handle center circle touch
+    if (target.id === 'center-circle' || target.closest('#center-circle')) {
+      this.createNewGenreCircle();
+      return;
+    }
+    
+    // Handle genre item touch (for long press)
+    const genreItem = target.classList.contains('genre-item') ? target : target.closest('.genre-item');
+    if (genreItem && !genreItem.classList.contains('inactive')) {
+      const promptId = (genreItem as HTMLElement).dataset.promptId;
+      if (promptId) {
+        this.handleGenrePointerDown(promptId, e);
+      }
+      return;
+    }
+    
+    // Default: handle container drag
     this.handlePointerDown(e);
   }
 
@@ -1403,7 +1740,16 @@ Always respond only in the following JSON format (exactly 5 objects):
     this.handlePointerMove(e);
   }
 
-  private handleTouchEnd() {
+  private handleTouchEnd(e: TouchEvent) {
+    const target = e.target as HTMLElement;
+    
+    // Handle genre item touch end
+    const genreItem = target.classList.contains('genre-item') ? target : target.closest('.genre-item');
+    if (genreItem) {
+      this.handleGenrePointerUp(e);
+      return;
+    }
+    
     this.handlePointerUp();
   }
 
@@ -1450,6 +1796,19 @@ Always respond only in the following JSON format (exactly 5 objects):
     this.requestUpdate();
   }
 
+  private handleSeedClick() {
+    this.dispatchEvent(new CustomEvent('reseed'));
+  }
+
+  private calculateFisheyeScale(genreX: number, genreY: number, radius: number): number {
+    const fixedCenterX = this.containerSize / 2;
+    const fixedCenterY = this.containerSize / 2;
+    const distance = Math.sqrt((genreX - fixedCenterX) ** 2 + (genreY - fixedCenterY) ** 2);
+    const maxDistance = radius * 2;
+    const normalized = Math.min(distance / maxDistance, 1);
+    return 1.8 - (normalized * 1.1); // 1.8 at center, 0.7 at edge
+  }
+
   private handleRadiusChange(e: Event) {
     const target = e.target as HTMLInputElement;
     // Slider range: 0-100 maps to radius multiplier 0.1-0.6
@@ -1476,6 +1835,13 @@ Always respond only in the following JSON format (exactly 5 objects):
     return activeCircle?.radiusMultiplier ?? 0.35;
   }
 
+  private getCircleName(circleIndex: number): string {
+    if (circleIndex === 0) {
+      return 'Root';
+    }
+    return `Circle ${circleIndex}`;
+  }
+
   public addFilteredPrompt(prompt: string) {
     this.filteredPrompts = new Set([...this.filteredPrompts, prompt]);
   }
@@ -1499,7 +1865,7 @@ Always respond only in the following JSON format (exactly 5 objects):
 
     if (!maxWeightPrompt || maxWeight <= 0.1) return null;
 
-    // Get position of the genre with max weight
+    // Get position of the genre with max weight using Fisheye-based calculation
     const radiusMultiplier = this.getActiveRadiusMultiplier();
     const radius = this.containerSize * radiusMultiplier;
     const activeCircle = this.getActiveCircle();
@@ -1507,12 +1873,42 @@ Always respond only in the following JSON format (exactly 5 objects):
 
     const fixedCenterX = this.containerSize / 2;
     const fixedCenterY = this.containerSize / 2;
+    const ringCenterX = fixedCenterX + activeCircle.ringOffsetX;
+    const ringCenterY = fixedCenterY + activeCircle.ringOffsetY;
+
+    // PASS 1: Calculate fisheye scales for all items using equal-spacing positions
+    const scaleData = promptArray.map((prompt, index) => {
+      const equalAngleStep = (Math.PI * 2) / promptArray.length;
+      const equalAngle = (index * equalAngleStep) - (Math.PI / 2);
+      const genreX = ringCenterX + Math.cos(equalAngle) * radius;
+      const genreY = ringCenterY + Math.sin(equalAngle) * radius;
+      const fisheyeScale = this.calculateFisheyeScale(genreX, genreY, radius);
+      return { prompt, index, fisheyeScale };
+    });
+
+    const totalScale = scaleData.reduce((sum, d) => sum + d.fisheyeScale, 0);
+
+    // PASS 2: Find the mid-angle position of the max weight genre
+    let currentAngle = -Math.PI / 2; // Start at top
+    let targetMidAngle = currentAngle;
+
+    for (let i = 0; i < scaleData.length; i++) {
+      const arcPortion = (scaleData[i].fisheyeScale / totalScale) * (Math.PI * 2);
+      if (i === maxWeightIndex) {
+        // Use mid-angle of the arc (where the text is displayed)
+        targetMidAngle = currentAngle + arcPortion / 2;
+        break;
+      }
+      currentAngle += arcPortion;
+    }
+
+    // Calculate position using Fisheye-based mid-angle
+    const genreX = ringCenterX + Math.cos(targetMidAngle) * radius;
+    const genreY = ringCenterY + Math.sin(targetMidAngle) * radius;
     
-    const pos = this.getGenrePosition(maxWeightIndex, promptArray.length, radius, activeCircle);
-    
-    // Calculate angle from center to genre
-    const dx = pos.x - fixedCenterX;
-    const dy = pos.y - fixedCenterY;
+    // Calculate angle from fixed center to genre position
+    const dx = genreX - fixedCenterX;
+    const dy = genreY - fixedCenterY;
     const angle = Math.atan2(dy, dx);
     
     // Calculate radius of center cross (2.5vmin / 2, converted to pixels)
@@ -1524,7 +1920,7 @@ Always respond only in the following JSON format (exactly 5 objects):
     const x1 = fixedCenterX + Math.cos(angle) * centerCircleRadius;
     const y1 = fixedCenterY + Math.sin(angle) * centerCircleRadius;
     
-    return { x1, y1, x2: pos.x, y2: pos.y };
+    return { x1, y1, x2: genreX, y2: genreY };
   }
 
   override render() {
@@ -1565,12 +1961,11 @@ Always respond only in the following JSON format (exactly 5 objects):
       }
     }
     
-    // Center cross: Position fix, Farbe = aktueller Mix
+    // Center cross: Position fix, Farbe = orange
     const centerCircleStyle = styleMap({
       left: '50%',
       top: '50%',
       transform: 'translate(-50%, -50%)',
-      '--cross-color': this.getMixColor(),
     });
 
     // Get position of genre with max weight for the indicator line
@@ -1584,11 +1979,7 @@ Always respond only in the following JSON format (exactly 5 objects):
         @mousedown=${this.handleMouseDown}
         @mousemove=${this.handleMouseMove}
         @mouseup=${this.handleMouseUp}
-        @mouseleave=${this.handleMouseUp}
-        @touchstart=${this.handleTouchStart}
-        @touchmove=${this.handleTouchMove}
-        @touchend=${this.handleTouchEnd}
-        @touchcancel=${this.handleTouchEnd}>
+        @mouseleave=${this.handleMouseUp}>
         ${this.renderGenres()}
         ${maxWeightPos && this.containerSize > 0 && this.showDebugPanel ? html`
           <svg id="max-weight-line" width=${this.containerSize} height=${this.containerSize} viewBox="0 0 ${this.containerSize} ${this.containerSize}">
@@ -1608,8 +1999,7 @@ Always respond only in the following JSON format (exactly 5 objects):
         <div 
           id="center-circle" 
           style=${centerCircleStyle}
-          @click=${this.handleCenterCircleClick}
-          @touchstart=${this.handleCenterCircleClick}></div>
+          @click=${this.handleCenterCircleClick}></div>
       </div>
       <button 
         id="back-button" 
@@ -1646,24 +2036,8 @@ Always respond only in the following JSON format (exactly 5 objects):
           ` : ''}
         </div>
       ` : ''}
-        <div id="media-controls">
-        <button 
-          class="nav-arrow-button" 
-          @click=${this.navigateBack} 
-          ?disabled=${this.activeCircleIndex <= 0}
-          title="Previous Level">
-          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" fill="currentColor"/>
-          </svg>
-        </button>
-        <button id="dice-button" @click=${this.handleDiceClick} title="Randomize Mix">
-          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM7.5 18C6.67 18 6 17.33 6 16.5S6.67 15 7.5 15s1.5.67 1.5 1.5S8.33 18 7.5 18zm0-9C6.67 9 6 8.33 6 7.5S6.67 6 7.5 6 9 6.67 9 7.5 8.33 9 7.5 9zm4.5 4.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm4.5 4.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm0-9c-.83 0-1.5-.67-1.5-1.5S15.17 6 16 6s1.5.67 1.5 1.5S16.83 9 16 9z" fill="currentColor"/>
-          </svg>
-        </button>
-        <play-pause-button 
-          .playbackState=${this.playbackState} 
-          @click=${this.playPause}></play-pause-button>
+      <div id="header">
+        <img id="header-logo" src="/Logo/Logo.png" alt="Logo" />
         <div id="volume-control" class=${classMap({ visible: this.showVolumeControl })}>
           <div id="volume-icon" @click=${this.toggleVolumeControl}>
             <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -1680,15 +2054,53 @@ Always respond only in the following JSON format (exactly 5 objects):
             @change=${this.handleVolumeChange}
           />
         </div>
-        <button 
-          class="nav-arrow-button" 
-          @click=${this.navigateNext} 
-          ?disabled=${this.activeCircleIndex >= this.genreCircleStack.length - 1}
-          title="Next Level">
-          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" fill="currentColor"/>
-          </svg>
-        </button>
+      </div>
+      <div id="media-controls">
+        <div class="presets-row">
+          ${[1, 2, 3, 4, 5, 6, 7, 8, 9].map(num => html`
+            <div 
+              class=${classMap({ 
+                'preset-slot': true, 
+                'saved': this.savedPresets.has(num) 
+              })}
+              @click=${() => this.handlePresetClick(num)}
+              title=${this.savedPresets.has(num) ? `Preset ${num} laden (oder Shift+${num} zum Löschen)` : `Taste ${num} zum Speichern`}
+            >${num}</div>
+          `)}
+        </div>
+        <div class="controls-row">
+          <button 
+            class="nav-arrow-button" 
+            @click=${this.navigateBack} 
+            ?disabled=${this.activeCircleIndex <= 0}
+            title="Previous Level">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" fill="currentColor"/>
+            </svg>
+          </button>
+          <button id="dice-button" @click=${this.handleDiceClick} title="Randomize Mix">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM7.5 18C6.67 18 6 17.33 6 16.5S6.67 15 7.5 15s1.5.67 1.5 1.5S8.33 18 7.5 18zm0-9C6.67 9 6 8.33 6 7.5S6.67 6 7.5 6 9 6.67 9 7.5 8.33 9 7.5 9zm4.5 4.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm4.5 4.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm0-9c-.83 0-1.5-.67-1.5-1.5S15.17 6 16 6s1.5.67 1.5 1.5S16.83 9 16 9z" fill="currentColor"/>
+            </svg>
+          </button>
+          <play-pause-button 
+            .playbackState=${this.playbackState} 
+            @click=${this.playPause}></play-pause-button>
+          <button id="seed-button" @click=${this.handleSeedClick} title="New Seed">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z" fill="currentColor"/>
+            </svg>
+          </button>
+          <button 
+            class="nav-arrow-button" 
+            @click=${this.navigateNext} 
+            ?disabled=${this.activeCircleIndex >= this.genreCircleStack.length - 1}
+            title="Next Level">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" fill="currentColor"/>
+            </svg>
+          </button>
+        </div>
       </div>
       <div id="radius-container">
         <input
@@ -2046,65 +2458,78 @@ Always respond only in the following JSON format (exactly 5 objects):
     });
 
     // Render circle outlines for each circle in the stack
-    const circleOutlines = this.genreCircleStack.map((circle) => {
+    const circleOutlines = this.genreCircleStack.map((circle, circleIndex) => {
       const radius = this.containerSize > 0 ? (this.containerSize * circle.radiusMultiplier) : 200;
       const centerX = this.containerSize / 2 + circle.ringOffsetX;
       const centerY = this.containerSize / 2 + circle.ringOffsetY;
       const diameter = radius * 2;
+      const isActive = circleIndex === this.activeCircleIndex;
+      const outlineColor = isActive ? '#FD7B2E' : 'rgba(255, 255, 255, 0.3)';
       const outlineStyle = styleMap({
         left: `${centerX}px`,
         top: `${centerY}px`,
         width: `${diameter}px`,
         height: `${diameter}px`,
         opacity: `${circle.expansionProgress}`,
+        borderColor: outlineColor,
       });
+      
+      // For passive circles, also render a label in the center
+      if (!isActive) {
+        const labelStyle = styleMap({
+          left: `${centerX}px`,
+          top: `${centerY}px`,
+          opacity: `${circle.expansionProgress}`,
+        });
+        const circleName = this.getCircleName(circleIndex);
+        return html`
+          <div class="genre-circle-outline" style=${outlineStyle}></div>
+          <div class="circle-label" style=${labelStyle}>${circleName}</div>
+        `;
+      }
+      
       return html`<div class="genre-circle-outline" style=${outlineStyle}></div>`;
     });
 
+    // Only render labels for the active circle, passive circles only show outlines
+    const activeItems = items.filter(item => item.circleIndex === this.activeCircleIndex);
+    
+    // PASS 1: Calculate fisheye scales for all items using equal-spacing positions
+    const activeCircle = this.getActiveCircle();
+    const radius = activeCircle && this.containerSize > 0 
+      ? (this.containerSize * activeCircle.radiusMultiplier) 
+      : 200;
+    
+    const scaleData = activeItems.map(item => {
+      // Calculate position using equal spacing (original positions)
+      const equalAngleStep = (Math.PI * 2) / item.total;
+      const equalAngle = (item.index * equalAngleStep) - (Math.PI / 2);
+      const fixedCenterX = this.containerSize / 2;
+      const fixedCenterY = this.containerSize / 2;
+      const ringCenterX = fixedCenterX + item.circle.ringOffsetX;
+      const ringCenterY = fixedCenterY + item.circle.ringOffsetY;
+      const genreX = ringCenterX + Math.cos(equalAngle) * radius;
+      const genreY = ringCenterY + Math.sin(equalAngle) * radius;
+      
+      const fisheyeScale = this.calculateFisheyeScale(genreX, genreY, radius);
+      return { ...item, fisheyeScale };
+    });
+    
+    // Calculate total scale for proportional distribution
+    const totalScale = scaleData.reduce((sum, d) => sum + d.fisheyeScale, 0);
+    
+    // PASS 2: Calculate proportional angles and render
+    let currentAngle = -Math.PI / 2; // Start at top
+    
     const genreItems = repeat(
-      items,
+      scaleData,
       (item) => item.key,
       (item) => {
-        const { circle, circleIndex, prompt, index, total } = item;
+        const { circle, circleIndex, prompt, fisheyeScale, total } = item;
         const isActive = circleIndex === this.activeCircleIndex;
-        // Each circle uses its own radius multiplier
-        const radius = this.containerSize > 0 ? (this.containerSize * circle.radiusMultiplier) : 200;
-        const pos = this.getGenrePosition(index, total, radius, circle);
-        const angleDeg = (pos.angle * 180 / Math.PI);
-        let rotationDeg = angleDeg + 90;
-        rotationDeg = ((rotationDeg % 360) + 360) % 360;
-        if (rotationDeg > 90 && rotationDeg <= 270) {
-          rotationDeg = (rotationDeg + 180) % 360;
-        }
-        const slotAngle = (Math.PI * 2) / total;
-        const boxAngle = slotAngle * 0.98;
-        const boxWidthPx = Math.max(20, 2 * radius * Math.sin(boxAngle / 2));
-        const boxHeightPx = Math.max(22, radius * 0.12);
-        // For active circles, use weight-based opacity
-        // For inactive circles, use a fixed opacity that's visible but distinct
-        const baseOpacity = isActive ? (prompt.weight > 0.1 ? 1 : 0.3) : 0.4;
-        const opacity = baseOpacity * circle.expansionProgress;
-        // Use white color if genre is not in mix (weight is low or zero), otherwise use active color
-        const textColor = isActive 
-          ? (prompt.weight <= 0.1 ? '#ffffff' : '#FD7B2E')
-          : '#ffffff'; // Passive circles always use white
-        const style = styleMap({
-          left: `${pos.x}px`,
-          top: `${pos.y}px`,
-          width: `${boxWidthPx}px`,
-          minHeight: `${boxHeightPx}px`,
-          transform: `translate(-50%, -50%) rotate(${rotationDeg}deg)`,
-          color: textColor,
-          opacity: `${opacity}`,
-        });
-        const classes = classMap({
-          'genre-item': true,
-          'inactive': !isActive,
-          'filtered': this.filteredPrompts.has(prompt.text),
-          'disabled': circle.disabledGenres.has(prompt.promptId) && !this.showingSubGenres,
-        });
+        
+        // Get display text first
         let displayText = prompt.text;
-        // Check if this is a generated genre (has a stored name)
         if (this.generatedGenreNames.has(prompt.promptId)) {
           displayText = this.generatedGenreNames.get(prompt.promptId) || prompt.text;
         } else if (this.showingSubGenres && this.selectedMainGenreId) {
@@ -2122,19 +2547,96 @@ Always respond only in the following JSON format (exactly 5 objects):
           const mainGenre = (mainGenresData as any[]).find(g => g.prompt === prompt.text);
           if (mainGenre) displayText = mainGenre.name;
         }
+        
+        // Calculate proportional arc portion based on fisheye scale
+        const arcPortion = (fisheyeScale / totalScale) * (Math.PI * 2);
+        const startAngle = currentAngle;
+        const endAngle = currentAngle + arcPortion;
+        currentAngle = endAngle; // Update for next item
+        
+        // Ring center position
+        const fixedCenterX = this.containerSize / 2;
+        const fixedCenterY = this.containerSize / 2;
+        const ringCenterX = fixedCenterX + circle.ringOffsetX;
+        const ringCenterY = fixedCenterY + circle.ringOffsetY;
+        
+        // Calculate arc path points with proportional angles
+        const startX = ringCenterX + Math.cos(startAngle) * radius;
+        const startY = ringCenterY + Math.sin(startAngle) * radius;
+        const endX = ringCenterX + Math.cos(endAngle) * radius;
+        const endY = ringCenterY + Math.sin(endAngle) * radius;
+        
+        // SVG arc: A rx ry x-axis-rotation large-arc-flag sweep-flag x y
+        const largeArcFlag = arcPortion > Math.PI ? 1 : 0;
+        const pathId = `arc-${circle.id}-${prompt.promptId}`;
+        const arcPath = `M ${startX} ${startY} A ${radius} ${radius} 0 ${largeArcFlag} 1 ${endX} ${endY}`;
+        
+        // Calculate font size with fisheye effect
+        const baseFontSize = 12;
+        const fontSize = baseFontSize * fisheyeScale;
+        
+        // For active circles, use weight-based opacity
+        const baseOpacity = isActive ? (prompt.weight > 0.1 ? 1 : 0.3) : 0.4;
+        const opacity = baseOpacity * circle.expansionProgress;
+        
+        // Text color
+        const textColor = isActive 
+          ? (prompt.weight <= 0.1 ? '#ffffff' : '#FD7B2E')
+          : '#ffffff';
+        
+        const isFiltered = this.filteredPrompts.has(prompt.text);
+        const isDisabled = circle.disabledGenres.has(prompt.promptId) && !this.showingSubGenres;
+        
+        const textClasses = [
+          isFiltered ? 'filtered' : '',
+          isDisabled ? 'disabled' : '',
+          !isActive ? 'inactive' : '',
+        ].filter(Boolean).join(' ');
+        
+        const svgStyle = styleMap({
+          left: '0',
+          top: '0',
+          width: `${this.containerSize}px`,
+          height: `${this.containerSize}px`,
+          opacity: `${opacity}`,
+        });
+        
         if (isActive) {
-          return html`<div
-            class=${classes}
-            style=${style}
-            @mousedown=${(e: MouseEvent) => this.handleGenreMouseDown(prompt.promptId, e)}
-            @mouseup=${this.handleGenreMouseUp}
-            @mouseleave=${this.handleGenreMouseUp}
-            @touchstart=${(e: TouchEvent) => this.handleGenreTouchStart(prompt.promptId, e)}
-            @touchend=${this.handleGenreTouchEnd}
-            @touchcancel=${this.handleGenreTouchEnd}
-            @click=${(e: MouseEvent) => this.handleGenreClick(prompt.promptId, e)}>${displayText}</div>`;
+          return html`
+            <svg class="genre-item-svg" style=${svgStyle}>
+              <defs>
+                <path id=${pathId} d=${arcPath} fill="none"/>
+              </defs>
+              <text 
+                class=${textClasses}
+                fill=${textColor}
+                style="font-size: ${fontSize}px"
+                data-prompt-id=${prompt.promptId}
+                @mousedown=${(e: MouseEvent) => this.handleGenreMouseDown(prompt.promptId, e)}
+                @mouseup=${this.handleGenreMouseUp}
+                @mouseleave=${this.handleGenreMouseUp}
+                @click=${(e: MouseEvent) => this.handleGenreClick(prompt.promptId, e)}>
+                <textPath href="#${pathId}" startOffset="50%" text-anchor="middle">
+                  ${displayText}
+                </textPath>
+              </text>
+            </svg>`;
         }
-        return html`<div class=${classes} style=${style}>${displayText}</div>`;
+        return html`
+          <svg class="genre-item-svg" style=${svgStyle}>
+            <defs>
+              <path id=${pathId} d=${arcPath} fill="none"/>
+            </defs>
+            <text 
+              class=${textClasses}
+              fill=${textColor}
+              style="font-size: ${fontSize}px"
+              data-prompt-id=${prompt.promptId}>
+              <textPath href="#${pathId}" startOffset="50%" text-anchor="middle">
+                ${displayText}
+              </textPath>
+            </text>
+          </svg>`;
       }
     );
 

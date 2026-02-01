@@ -60,6 +60,10 @@ function main() {
     liveMusicHelper.setVolume(volume);
   }));
 
+  pdjMidi.addEventListener('reseed', () => {
+    liveMusicHelper.reseed();
+  });
+
   liveMusicHelper.addEventListener('playback-state-changed', ((e: Event) => {
     const customEvent = e as CustomEvent<PlaybackState>;
     const playbackState = customEvent.detail;

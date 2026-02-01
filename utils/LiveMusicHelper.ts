@@ -191,4 +191,17 @@ export class LiveMusicHelper extends EventTarget {
     return this.outputNode.gain.value;
   }
 
+  public async reseed() {
+    // Stop current session and create a new one with a fresh seed
+    const wasPlaying = this.playbackState === 'playing';
+    this.stop();
+    // Force new connection for new seed
+    this.sessionPromise = null;
+    this.session = null;
+    // If it was playing, start again with the new seed
+    if (wasPlaying) {
+      await this.play();
+    }
+  }
+
 }

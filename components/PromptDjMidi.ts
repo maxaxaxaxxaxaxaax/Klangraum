@@ -341,6 +341,32 @@ export class PromptDjMidi extends LitElement {
       height: 28px;
       color: #ffffff;
     }
+    #replay-button {
+      height: 40px;
+      padding: 0 16px;
+      border-radius: 20px;
+      border: 2px solid #ffffff;
+      background: transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+      margin: 0;
+      color: #ffffff;
+      font-size: 14px;
+      font-weight: 600;
+      font-family: 'Satoshi', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+    #replay-button:hover {
+      transform: scale(1.05);
+      border-color: rgba(255, 255, 255, 0.8);
+      background: rgba(255, 255, 255, 0.1);
+    }
+    #replay-button:active {
+      transform: scale(0.95);
+    }
     .nav-arrow-button {
       width: 40px;
       height: 40px;
@@ -757,6 +783,457 @@ export class PromptDjMidi extends LitElement {
     .preset-slot.saved:hover {
       background: rgba(253, 123, 46, 0.5);
     }
+    #replay-modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      backdrop-filter: blur(10px);
+    }
+    #replay-modal {
+      background: linear-gradient(145deg, #1a1a1a 0%, #2d2d2d 100%);
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      border-radius: 16px;
+      padding: 30px;
+      min-width: 360px;
+      max-width: 90vw;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    }
+    #replay-modal h2 {
+      margin: 0 0 20px 0;
+      font-size: 24px;
+      font-weight: 600;
+      color: #fff;
+      text-align: center;
+      font-family: 'Satoshi', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+    #replay-modal .duration-info {
+      text-align: center;
+      font-size: 48px;
+      font-weight: 700;
+      color: #FD7B2E;
+      margin: 20px 0;
+      font-family: 'Satoshi', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+    #replay-modal .duration-label {
+      text-align: center;
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.6);
+      margin-bottom: 30px;
+    }
+    #replay-modal .status-text {
+      text-align: center;
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.8);
+      margin-bottom: 20px;
+      min-height: 20px;
+    }
+    #replay-modal .modal-buttons {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    #replay-modal .modal-btn {
+      padding: 14px 28px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: 'Satoshi', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    #replay-modal .modal-btn svg {
+      width: 20px;
+      height: 20px;
+    }
+    #replay-modal .modal-btn.primary {
+      background: #FD7B2E;
+      color: #fff;
+      border: none;
+    }
+    #replay-modal .modal-btn.primary:hover {
+      background: #e66a1f;
+      transform: scale(1.02);
+    }
+    #replay-modal .modal-btn.primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+    #replay-modal .modal-btn.secondary {
+      background: transparent;
+      color: #fff;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+    #replay-modal .modal-btn.secondary:hover {
+      border-color: rgba(255, 255, 255, 0.6);
+      background: rgba(255, 255, 255, 0.1);
+    }
+    #replay-modal .modal-btn.secondary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    #replay-modal .close-btn {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      color: #fff;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+    #replay-modal .close-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+    #replay-modal .close-btn svg {
+      width: 18px;
+      height: 18px;
+    }
+    #replay-modal-content {
+      position: relative;
+    }
+    .kie-section {
+      margin-top: 24px;
+      padding-top: 24px;
+      border-top: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .kie-section h3 {
+      margin: 0 0 16px 0;
+      font-size: 16px;
+      font-weight: 600;
+      color: #fff;
+      text-align: center;
+    }
+    .kie-status {
+      text-align: center;
+      padding: 20px;
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 14px;
+    }
+    .kie-status .spinner {
+      display: inline-block;
+      width: 24px;
+      height: 24px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-top-color: #FD7B2E;
+      border-radius: 50%;
+      animation: kie-spin 1s linear infinite;
+      margin-bottom: 12px;
+    }
+    @keyframes kie-spin {
+      to { transform: rotate(360deg); }
+    }
+    .kie-songs {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .kie-song-card {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 16px;
+      width: 160px;
+      text-align: center;
+    }
+    .kie-song-card img {
+      width: 100%;
+      height: 120px;
+      object-fit: cover;
+      border-radius: 8px;
+      margin-bottom: 12px;
+    }
+    .kie-song-card .song-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 4px;
+    }
+    .kie-song-card .song-duration {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.6);
+      margin-bottom: 12px;
+    }
+    .kie-song-card .song-buttons {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+    }
+    .kie-song-card .song-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+    .kie-song-card .song-btn.play {
+      background: #FD7B2E;
+      color: #fff;
+    }
+    .kie-song-card .song-btn.play:hover {
+      background: #e66a1f;
+      transform: scale(1.05);
+    }
+    .kie-song-card .song-btn.download {
+      background: rgba(255, 255, 255, 0.2);
+      color: #fff;
+    }
+    .kie-song-card .song-btn.download:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+    .kie-song-card .song-btn svg {
+      width: 18px;
+      height: 18px;
+    }
+    .kie-error {
+      text-align: center;
+      padding: 20px;
+      color: #ff6b6b;
+      font-size: 14px;
+    }
+    .kie-form {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .kie-form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .kie-form-group label {
+      font-size: 13px;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.9);
+    }
+    .kie-form-group .hint {
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.5);
+      margin-top: 2px;
+    }
+    .kie-input {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      padding: 10px 12px;
+      color: #fff;
+      font-size: 14px;
+      font-family: 'Satoshi', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .kie-input:focus {
+      border-color: #FD7B2E;
+    }
+    .kie-input::placeholder {
+      color: rgba(255, 255, 255, 0.4);
+    }
+    .kie-textarea {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      padding: 10px 12px;
+      color: #fff;
+      font-size: 14px;
+      font-family: 'Satoshi', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      outline: none;
+      transition: border-color 0.2s;
+      resize: vertical;
+      min-height: 80px;
+    }
+    .kie-textarea:focus {
+      border-color: #FD7B2E;
+    }
+    .kie-textarea::placeholder {
+      color: rgba(255, 255, 255, 0.4);
+    }
+    .kie-audio-preview {
+      background: rgba(253, 123, 46, 0.15);
+      border: 1px solid rgba(253, 123, 46, 0.3);
+      border-radius: 8px;
+      padding: 12px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .kie-audio-preview .audio-icon {
+      width: 40px;
+      height: 40px;
+      background: #FD7B2E;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .kie-audio-preview .audio-icon svg {
+      width: 20px;
+      height: 20px;
+      color: #fff;
+    }
+    .kie-audio-preview .audio-info {
+      flex: 1;
+    }
+    .kie-audio-preview .audio-info .title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #fff;
+    }
+    .kie-audio-preview .audio-info .duration {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.6);
+    }
+    .kie-audio-preview .preview-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(255, 255, 255, 0.2);
+      color: #fff;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+    }
+    .kie-audio-preview .preview-btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+    .kie-audio-preview .preview-btn.playing {
+      background: #FD7B2E;
+    }
+    .kie-audio-preview .preview-btn svg {
+      width: 18px;
+      height: 18px;
+    }
+    .kie-crop-controls {
+      margin-top: 12px;
+      padding: 12px;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 8px;
+    }
+    .kie-crop-controls .crop-label {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.7);
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .kie-crop-slider-container {
+      position: relative;
+      height: 48px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+      margin-bottom: 8px;
+      cursor: pointer;
+      touch-action: none;
+      user-select: none;
+    }
+    .kie-crop-slider-container .crop-range {
+      position: absolute;
+      top: 0;
+      height: 100%;
+      background: rgba(253, 123, 46, 0.15);
+      border-top: 2px solid rgba(253, 123, 46, 0.6);
+      border-bottom: 2px solid rgba(253, 123, 46, 0.6);
+      cursor: grab;
+      z-index: 1;
+    }
+    .kie-crop-slider-container .crop-range:active {
+      cursor: grabbing;
+    }
+    .kie-crop-slider-container .crop-handle {
+      position: absolute;
+      top: 0;
+      width: 12px;
+      height: 100%;
+      background: #FD7B2E;
+      cursor: ew-resize;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s;
+    }
+    .kie-crop-slider-container .crop-handle:hover {
+      background: #ff8c42;
+    }
+    .kie-crop-slider-container .crop-handle.start {
+      left: 0;
+      border-radius: 4px 0 0 4px;
+      transform: translateX(-6px);
+    }
+    .kie-crop-slider-container .crop-handle.end {
+      right: 0;
+      border-radius: 0 4px 4px 0;
+      transform: translateX(6px);
+    }
+    .kie-crop-slider-container .crop-handle::after {
+      content: '';
+      width: 2px;
+      height: 20px;
+      background: rgba(255, 255, 255, 0.6);
+      border-radius: 1px;
+    }
+    .kie-crop-slider-container .crop-time-label {
+      position: absolute;
+      bottom: -18px;
+      font-size: 10px;
+      color: rgba(255, 255, 255, 0.6);
+      transform: translateX(-50%);
+      white-space: nowrap;
+    }
+    .kie-crop-slider-container .crop-time-label.start {
+      left: 0;
+    }
+    .kie-crop-slider-container .crop-time-label.end {
+      right: 0;
+      transform: translateX(50%);
+    }
+    .kie-crop-waveform {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border-radius: 4px;
+      pointer-events: none;
+    }
+    .kie-crop-playhead {
+      position: absolute;
+      top: 0;
+      width: 2px;
+      height: 100%;
+      background: #ffffff;
+      pointer-events: none;
+      z-index: 10;
+      box-shadow: 0 0 4px rgba(255, 255, 255, 0.5);
+      transition: opacity 0.2s;
+    }
+    .kie-crop-playhead.hidden {
+      opacity: 0;
+    }
   `;
 
   private prompts: Map<string, Prompt>;
@@ -797,6 +1274,44 @@ export class PromptDjMidi extends LitElement {
   @state() private savedPresets: Map<number, { offsetX: number; offsetY: number; radius: number; circleIndex: number }> = new Map();
   private presetAnimationId: number | null = null;
   @state() private systemInstruction = 'You are a helpful AI assistant for music production and DJing.';
+  
+  // Replay modal state
+  @state() private showReplayModal = false;
+  @state() private replayDuration = 0;
+  @state() private replayStatus: 'idle' | 'playing' | 'stopped' = 'idle';
+  @state() private isReplayPlaying = false;
+  
+  // KIE.ai song generation state
+  @state() private kieStatus: 'idle' | 'uploading' | 'generating' | 'polling' | 'complete' | 'error' = 'idle';
+  @state() private kieStatusMessage = '';
+  @state() private kieGeneratedSongs: Array<{ audio_url: string; image_url: string; duration: number }> = [];
+  @state() private kiePlayingSongIndex: number | null = null;
+  private kieAudioElement: HTMLAudioElement | null = null;
+  
+  // KIE.ai input fields
+  @state() private kieStyleInput = '';
+  @state() private kieLyricsInput = '';
+  
+  // Audio cropping state
+  @state() private audioCropStart = 0;  // Start time in seconds
+  @state() private audioCropEnd = 60;   // End time in seconds
+  @state() private isPreviewPlaying = false;
+  private previewAudioSource: AudioBufferSourceNode | null = null;
+  
+  // Crop dragging state
+  @state() private cropDragging: 'start' | 'end' | 'range' | null = null;
+  private cropDragStartX = 0;
+  private cropDragStartValue = 0;
+  private cropDragEndValue = 0;
+  private cropContainerWidth = 0;
+  
+  // Waveform visualization
+  @state() private waveformData: number[] = [];
+  
+  // Playhead position (0-1 relative to replay duration)
+  @state() private playheadPosition = 0;
+  private playheadAnimationId: number | null = null;
+  private playheadStartTime = 0;
   @state() private newCircleMessageTemplate = `Take the currently active {genres}, combine them meaningfully, and generate 5 new named prompts that can be used for further mixing.
 Always respond only in the following JSON format (exactly 5 objects):
 
@@ -1025,11 +1540,21 @@ Always respond only in the following JSON format (exactly 5 objects):
     this.presetAnimationId = requestAnimationFrame(animate);
   }
 
-  override updated() {
+  override updated(changedProperties: Map<string | number | symbol, unknown>) {
     // Use requestAnimationFrame to defer initialization to avoid triggering
     // a new update cycle during the current update
     if (this.containerSize === 0) {
       requestAnimationFrame(() => this.initializeContainer());
+    }
+    
+    // Re-render waveform when data or crop changes
+    if (changedProperties.has('waveformData') || 
+        changedProperties.has('audioCropStart') || 
+        changedProperties.has('audioCropEnd')) {
+      const canvas = this.shadowRoot?.querySelector('.kie-crop-waveform') as HTMLCanvasElement;
+      if (canvas) {
+        this.renderWaveform(canvas);
+      }
     }
   }
 
@@ -1800,6 +2325,447 @@ Always respond only in the following JSON format (exactly 5 objects):
     this.dispatchEvent(new CustomEvent('reseed'));
   }
 
+  private handleReplayClick() {
+    // Open the replay modal and request duration info
+    this.dispatchEvent(new CustomEvent('replay-get-duration'));
+    this.showReplayModal = true;
+    this.replayStatus = 'idle';
+    this.isReplayPlaying = false;
+    // Initialize crop to full duration
+    this.audioCropStart = 0;
+    this.audioCropEnd = this.replayDuration || 60;
+    // Request waveform data for visualization
+    this.waveformData = [];
+    this.requestWaveformData();
+  }
+
+  private closeReplayModal() {
+    // Stop replay if playing
+    if (this.isReplayPlaying) {
+      this.dispatchEvent(new CustomEvent('replay-stop'));
+    }
+    this.showReplayModal = false;
+    this.replayStatus = 'idle';
+    this.isReplayPlaying = false;
+    // Reset KIE.ai state
+    this.resetKieState();
+  }
+
+  private handleReplayPlay() {
+    if (this.replayDuration < 1) {
+      this.replayStatus = 'idle';
+      return;
+    }
+    this.replayStatus = 'playing';
+    this.isReplayPlaying = true;
+    this.dispatchEvent(new CustomEvent('replay-play'));
+  }
+
+  private handleReplayStop() {
+    this.dispatchEvent(new CustomEvent('replay-stop'));
+    this.replayStatus = 'stopped';
+    this.isReplayPlaying = false;
+  }
+
+  private handleReplayDownload() {
+    this.dispatchEvent(new CustomEvent('replay-download'));
+  }
+
+  /**
+   * Update replay duration from external source
+   */
+  public setReplayDuration(duration: number) {
+    this.replayDuration = duration;
+    // Update crop end if it exceeds the new duration
+    if (this.audioCropEnd > duration) {
+      this.audioCropEnd = duration;
+    }
+    // Ensure crop start is valid
+    if (this.audioCropStart >= duration) {
+      this.audioCropStart = 0;
+    }
+  }
+
+  /**
+   * Called when replay playback ends
+   */
+  public onReplayEnded() {
+    this.replayStatus = 'stopped';
+    this.isReplayPlaying = false;
+  }
+
+  /**
+   * Start KIE.ai song generation
+   */
+  private handleKieGenerateSong() {
+    if (this.replayDuration < 1) {
+      return;
+    }
+    // Stop preview if playing
+    this.stopAudioPreview();
+    
+    this.kieStatus = 'uploading';
+    this.kieStatusMessage = 'Audio wird hochgeladen...';
+    this.kieGeneratedSongs = [];
+    this.dispatchEvent(new CustomEvent('kie-generate-song', {
+      detail: {
+        style: this.kieStyleInput.trim(),
+        lyrics: this.kieLyricsInput.trim(),
+        cropStart: this.audioCropStart,
+        cropEnd: this.audioCropEnd,
+      }
+    }));
+  }
+
+  /**
+   * Update KIE.ai generation status from external source
+   */
+  public setKieStatus(status: 'idle' | 'uploading' | 'generating' | 'polling' | 'complete' | 'error', message?: string) {
+    this.kieStatus = status;
+    this.kieStatusMessage = message || '';
+  }
+
+  /**
+   * Set generated songs from KIE.ai
+   */
+  public setKieGeneratedSongs(songs: Array<{ audio_url: string; image_url: string; duration: number }>) {
+    this.kieGeneratedSongs = songs;
+    this.kieStatus = 'complete';
+  }
+
+  /**
+   * Play a KIE.ai generated song
+   */
+  private handleKieSongPlay(index: number) {
+    const song = this.kieGeneratedSongs[index];
+    if (!song) return;
+
+    // Stop current audio if playing
+    if (this.kieAudioElement) {
+      this.kieAudioElement.pause();
+      this.kieAudioElement = null;
+    }
+
+    // If clicking on same song, just stop
+    if (this.kiePlayingSongIndex === index) {
+      this.kiePlayingSongIndex = null;
+      return;
+    }
+
+    // Play the song
+    this.kieAudioElement = new Audio(song.audio_url);
+    this.kieAudioElement.play();
+    this.kiePlayingSongIndex = index;
+
+    this.kieAudioElement.onended = () => {
+      this.kiePlayingSongIndex = null;
+      this.kieAudioElement = null;
+      this.requestUpdate();
+    };
+  }
+
+  /**
+   * Download a KIE.ai generated song
+   */
+  private handleKieSongDownload(index: number) {
+    const song = this.kieGeneratedSongs[index];
+    if (!song) return;
+
+    const a = document.createElement('a');
+    a.href = song.audio_url;
+    a.download = `klanggraum-song-${index + 1}.mp3`;
+    a.target = '_blank';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }
+
+  /**
+   * Reset KIE.ai state
+   */
+  private resetKieState() {
+    if (this.kieAudioElement) {
+      this.kieAudioElement.pause();
+      this.kieAudioElement = null;
+    }
+    this.stopAudioPreview();
+    this.kieStatus = 'idle';
+    this.kieStatusMessage = '';
+    this.kieGeneratedSongs = [];
+    this.kiePlayingSongIndex = null;
+  }
+
+  /**
+   * Play audio preview of the cropped section
+   */
+  private handleAudioPreviewPlay() {
+    if (this.isPreviewPlaying) {
+      this.stopAudioPreview();
+      return;
+    }
+    
+    // Dispatch event to play cropped audio
+    this.isPreviewPlaying = true;
+    this.dispatchEvent(new CustomEvent('replay-preview-play', {
+      detail: {
+        startTime: this.audioCropStart,
+        endTime: this.audioCropEnd,
+      }
+    }));
+    
+    // Start playhead animation
+    this.startPlayheadAnimation();
+  }
+
+  /**
+   * Start playhead animation
+   */
+  private startPlayheadAnimation() {
+    this.playheadStartTime = performance.now();
+    this.playheadPosition = this.audioCropStart / this.replayDuration;
+    
+    const duration = (this.audioCropEnd - this.audioCropStart) * 1000; // in ms
+    
+    const animate = () => {
+      if (!this.isPreviewPlaying) {
+        this.playheadPosition = 0;
+        return;
+      }
+      
+      const elapsed = performance.now() - this.playheadStartTime;
+      const progress = Math.min(elapsed / duration, 1);
+      
+      // Calculate playhead position relative to full duration
+      const currentTime = this.audioCropStart + (this.audioCropEnd - this.audioCropStart) * progress;
+      this.playheadPosition = currentTime / this.replayDuration;
+      
+      if (progress < 1) {
+        this.playheadAnimationId = requestAnimationFrame(animate);
+      } else {
+        this.playheadPosition = 0;
+      }
+    };
+    
+    this.playheadAnimationId = requestAnimationFrame(animate);
+  }
+
+  /**
+   * Stop playhead animation
+   */
+  private stopPlayheadAnimation() {
+    if (this.playheadAnimationId) {
+      cancelAnimationFrame(this.playheadAnimationId);
+      this.playheadAnimationId = null;
+    }
+    this.playheadPosition = 0;
+  }
+
+  /**
+   * Stop audio preview
+   */
+  private stopAudioPreview() {
+    if (this.previewAudioSource) {
+      try {
+        this.previewAudioSource.stop();
+      } catch (e) {
+        // Ignore if already stopped
+      }
+      this.previewAudioSource = null;
+    }
+    this.isPreviewPlaying = false;
+    this.stopPlayheadAnimation();
+    this.dispatchEvent(new CustomEvent('replay-preview-stop'));
+  }
+
+  /**
+   * Called when preview playback ends
+   */
+  public onPreviewEnded() {
+    this.isPreviewPlaying = false;
+    this.previewAudioSource = null;
+    this.stopPlayheadAnimation();
+    this.requestUpdate();
+  }
+
+  /**
+   * Update crop start time
+   */
+  private handleCropStartChange(value: number) {
+    const maxStart = Math.max(0, this.audioCropEnd - 1);
+    this.audioCropStart = Math.max(0, Math.min(value, maxStart));
+  }
+
+  /**
+   * Update crop end time
+   */
+  private handleCropEndChange(value: number) {
+    const minEnd = this.audioCropStart + 1;
+    const maxEnd = this.replayDuration;
+    this.audioCropEnd = Math.max(minEnd, Math.min(value, maxEnd));
+  }
+
+  /**
+   * Get the cropped duration
+   */
+  private getCroppedDuration(): number {
+    return Math.max(0, this.audioCropEnd - this.audioCropStart);
+  }
+
+  /**
+   * Handle crop drag start
+   */
+  private handleCropDragStart(e: PointerEvent, type: 'start' | 'end' | 'range') {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    const container = (e.currentTarget as HTMLElement).closest('.kie-crop-slider-container') as HTMLElement;
+    if (!container) return;
+    
+    this.cropDragging = type;
+    this.cropDragStartX = e.clientX;
+    this.cropDragStartValue = this.audioCropStart;
+    this.cropDragEndValue = this.audioCropEnd;
+    this.cropContainerWidth = container.getBoundingClientRect().width;
+    
+    // Add global listeners
+    window.addEventListener('pointermove', this.handleCropDragMove);
+    window.addEventListener('pointerup', this.handleCropDragEnd);
+  }
+
+  /**
+   * Handle crop drag move (bound method)
+   */
+  private handleCropDragMove = (e: PointerEvent) => {
+    if (!this.cropDragging || this.cropContainerWidth === 0) return;
+    
+    const deltaX = e.clientX - this.cropDragStartX;
+    const deltaTime = (deltaX / this.cropContainerWidth) * this.replayDuration;
+    
+    const minDuration = 1; // Minimum 1 second crop
+    
+    if (this.cropDragging === 'start') {
+      // Dragging start handle
+      let newStart = this.cropDragStartValue + deltaTime;
+      newStart = Math.max(0, Math.min(newStart, this.cropDragEndValue - minDuration));
+      this.audioCropStart = newStart;
+    } else if (this.cropDragging === 'end') {
+      // Dragging end handle
+      let newEnd = this.cropDragEndValue + deltaTime;
+      newEnd = Math.max(this.cropDragStartValue + minDuration, Math.min(newEnd, this.replayDuration));
+      this.audioCropEnd = newEnd;
+    } else if (this.cropDragging === 'range') {
+      // Dragging entire range
+      const rangeSize = this.cropDragEndValue - this.cropDragStartValue;
+      let newStart = this.cropDragStartValue + deltaTime;
+      let newEnd = this.cropDragEndValue + deltaTime;
+      
+      // Clamp to bounds
+      if (newStart < 0) {
+        newStart = 0;
+        newEnd = rangeSize;
+      }
+      if (newEnd > this.replayDuration) {
+        newEnd = this.replayDuration;
+        newStart = this.replayDuration - rangeSize;
+      }
+      
+      this.audioCropStart = newStart;
+      this.audioCropEnd = newEnd;
+    }
+    
+    this.requestUpdate();
+  };
+
+  /**
+   * Handle crop drag end (bound method)
+   */
+  private handleCropDragEnd = () => {
+    this.cropDragging = null;
+    window.removeEventListener('pointermove', this.handleCropDragMove);
+    window.removeEventListener('pointerup', this.handleCropDragEnd);
+  };
+
+  /**
+   * Handle click on crop container to set position
+   */
+  private handleCropContainerClick(e: PointerEvent) {
+    // Only handle direct clicks on the container background, not on handles or range
+    if ((e.target as HTMLElement).classList.contains('crop-handle') || 
+        (e.target as HTMLElement).classList.contains('crop-range')) {
+      return;
+    }
+    
+    const container = e.currentTarget as HTMLElement;
+    const rect = container.getBoundingClientRect();
+    const clickX = e.clientX - rect.left;
+    const clickRatio = clickX / rect.width;
+    const clickTime = clickRatio * this.replayDuration;
+    
+    // Determine if click is closer to start or end
+    const midPoint = (this.audioCropStart + this.audioCropEnd) / 2;
+    
+    if (clickTime < midPoint) {
+      // Move start to click position
+      this.handleCropStartChange(Math.max(0, Math.min(clickTime, this.audioCropEnd - 1)));
+    } else {
+      // Move end to click position
+      this.handleCropEndChange(Math.max(this.audioCropStart + 1, Math.min(clickTime, this.replayDuration)));
+    }
+  }
+
+  /**
+   * Set waveform data for visualization
+   */
+  public setWaveformData(data: number[]) {
+    this.waveformData = data;
+  }
+
+  /**
+   * Request waveform data from audio buffer
+   */
+  private requestWaveformData() {
+    this.dispatchEvent(new CustomEvent('replay-get-waveform'));
+  }
+
+  /**
+   * Render waveform on canvas
+   */
+  private renderWaveform(canvas: HTMLCanvasElement) {
+    if (!canvas || this.waveformData.length === 0) return;
+    
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    
+    const width = canvas.width;
+    const height = canvas.height;
+    const barCount = this.waveformData.length;
+    const barWidth = width / barCount;
+    
+    // Clear canvas
+    ctx.clearRect(0, 0, width, height);
+    
+    // Draw waveform bars
+    const centerY = height / 2;
+    
+    for (let i = 0; i < barCount; i++) {
+      const amplitude = this.waveformData[i];
+      const barHeight = amplitude * height * 0.9;
+      const x = i * barWidth;
+      
+      // Check if this bar is in the selected crop range
+      const barTime = (i / barCount) * this.replayDuration;
+      const isSelected = barTime >= this.audioCropStart && barTime <= this.audioCropEnd;
+      
+      // Set color based on selection
+      ctx.fillStyle = isSelected 
+        ? 'rgba(253, 123, 46, 0.8)' 
+        : 'rgba(255, 255, 255, 0.3)';
+      
+      // Draw bar centered vertically
+      ctx.fillRect(x, centerY - barHeight / 2, Math.max(1, barWidth - 1), barHeight);
+    }
+  }
+
   private calculateFisheyeScale(genreX: number, genreY: number, radius: number): number {
     const fixedCenterX = this.containerSize / 2;
     const fixedCenterY = this.containerSize / 2;
@@ -2091,6 +3057,9 @@ Always respond only in the following JSON format (exactly 5 objects):
               <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z" fill="currentColor"/>
             </svg>
           </button>
+          <button id="replay-button" @click=${this.handleReplayClick} title="Replay last 60 seconds">
+            Replay
+          </button>
           <button 
             class="nav-arrow-button" 
             @click=${this.navigateNext} 
@@ -2117,7 +3086,295 @@ Always respond only in the following JSON format (exactly 5 objects):
       </div>
       <div id="debug-panel" class=${classMap({ visible: this.showDebugPanel })}>
         ${this.renderDebugPanel()}
-      </div>`;
+      </div>
+      ${this.showReplayModal ? this.renderReplayModal() : ''}`;
+  }
+
+  private renderReplayModal() {
+    const formatDuration = (seconds: number) => {
+      const mins = Math.floor(seconds / 60);
+      const secs = Math.floor(seconds % 60);
+      return `${mins}:${secs.toString().padStart(2, '0')}`;
+    };
+
+    const getStatusText = () => {
+      if (this.replayDuration < 1) {
+        return 'Keine Aufnahme vorhanden. Starte zuerst die Wiedergabe.';
+      }
+      switch (this.replayStatus) {
+        case 'playing':
+          return 'Wiedergabe läuft...';
+        case 'stopped':
+          return 'Wiedergabe beendet.';
+        default:
+          return 'Bereit zur Wiedergabe.';
+      }
+    };
+
+    const renderKieSection = () => {
+      // Show loading state
+      if (this.kieStatus === 'uploading' || this.kieStatus === 'generating' || this.kieStatus === 'polling') {
+        return html`
+          <div class="kie-section">
+            <h3>Song erstellen mit KIE.ai</h3>
+            <div class="kie-status">
+              <div class="spinner"></div>
+              <div>${this.kieStatusMessage || 'Verarbeitung...'}</div>
+            </div>
+          </div>
+        `;
+      }
+
+      // Show error state
+      if (this.kieStatus === 'error') {
+        return html`
+          <div class="kie-section">
+            <h3>Song erstellen mit KIE.ai</h3>
+            <div class="kie-error">
+              <div>Fehler: ${this.kieStatusMessage}</div>
+              <button class="modal-btn secondary" @click=${() => this.kieStatus = 'idle'} style="margin-top: 12px;">
+                Erneut versuchen
+              </button>
+            </div>
+          </div>
+        `;
+      }
+
+      // Show results
+      if (this.kieStatus === 'complete' && this.kieGeneratedSongs.length > 0) {
+        return html`
+          <div class="kie-section">
+            <h3>Generierte Songs</h3>
+            <div class="kie-songs">
+              ${this.kieGeneratedSongs.map((song, index) => html`
+                <div class="kie-song-card">
+                  <img src="${song.image_url}" alt="Song Cover ${index + 1}" />
+                  <div class="song-title">Variante ${index + 1}</div>
+                  <div class="song-duration">${formatDuration(song.duration)}</div>
+                  <div class="song-buttons">
+                    <button 
+                      class="song-btn play" 
+                      @click=${() => this.handleKieSongPlay(index)}
+                      title="${this.kiePlayingSongIndex === index ? 'Stop' : 'Abspielen'}"
+                    >
+                      ${this.kiePlayingSongIndex === index ? html`
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M6 6h12v12H6z" fill="currentColor"/>
+                        </svg>
+                      ` : html`
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M8 5v14l11-7z" fill="currentColor"/>
+                        </svg>
+                      `}
+                    </button>
+                    <button 
+                      class="song-btn download" 
+                      @click=${() => this.handleKieSongDownload(index)}
+                      title="Download"
+                    >
+                      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" fill="currentColor"/>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              `)}
+            </div>
+            <div style="text-align: center; margin-top: 16px;">
+              <button class="modal-btn secondary" @click=${() => this.resetKieState()}>
+                Neuen Song erstellen
+              </button>
+            </div>
+          </div>
+        `;
+      }
+
+      // Show form with audio preview, style and lyrics inputs
+      return html`
+        <div class="kie-section">
+          <h3>Song erstellen mit KIE.ai</h3>
+          <div class="kie-form">
+            <!-- Audio Preview with Cropping -->
+            <div class="kie-form-group">
+              <label>Audio (${formatDuration(this.replayDuration)} aufgenommen)</label>
+              <div class="kie-audio-preview">
+                <div class="audio-icon">
+                  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" fill="currentColor"/>
+                  </svg>
+                </div>
+                <div class="audio-info">
+                  <div class="title">Ausgewählter Bereich</div>
+                  <div class="duration">${formatDuration(this.getCroppedDuration())} ausgewählt</div>
+                </div>
+                <button 
+                  class="preview-btn ${this.isPreviewPlaying ? 'playing' : ''}" 
+                  @click=${this.handleAudioPreviewPlay}
+                  title="${this.isPreviewPlaying ? 'Stop' : 'Vorschau'}"
+                  ?disabled=${this.replayDuration < 1}
+                >
+                  ${this.isPreviewPlaying ? html`
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M6 6h12v12H6z" fill="currentColor"/>
+                    </svg>
+                  ` : html`
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M8 5v14l11-7z" fill="currentColor"/>
+                    </svg>
+                  `}
+                </button>
+              </div>
+              
+              <!-- Crop Controls -->
+              <div class="kie-crop-controls">
+                <div class="crop-label">
+                  <span>Bereich zuschneiden</span>
+                  <span>${formatDuration(this.audioCropStart)} - ${formatDuration(this.audioCropEnd)}</span>
+                </div>
+                
+                <!-- Interactive Crop Slider with Waveform -->
+                <div 
+                  class="kie-crop-slider-container"
+                  @pointerdown=${(e: PointerEvent) => this.handleCropContainerClick(e)}
+                >
+                  <!-- Waveform Canvas (background) -->
+                  <canvas 
+                    class="kie-crop-waveform" 
+                    width="400" 
+                    height="48"
+                  ></canvas>
+                  <!-- Playhead indicator -->
+                  <div 
+                    class="kie-crop-playhead ${this.isPreviewPlaying ? '' : 'hidden'}"
+                    style="left: ${this.playheadPosition * 100}%;"
+                  ></div>
+                  <!-- Selected Range (overlay) -->
+                  <div 
+                    class="crop-range" 
+                    style="left: ${(this.audioCropStart / Math.max(this.replayDuration, 1)) * 100}%; width: ${((this.audioCropEnd - this.audioCropStart) / Math.max(this.replayDuration, 1)) * 100}%;"
+                    @pointerdown=${(e: PointerEvent) => this.handleCropDragStart(e, 'range')}
+                  >
+                    <!-- Start Handle -->
+                    <div 
+                      class="crop-handle start"
+                      @pointerdown=${(e: PointerEvent) => this.handleCropDragStart(e, 'start')}
+                    ></div>
+                    <!-- End Handle -->
+                    <div 
+                      class="crop-handle end"
+                      @pointerdown=${(e: PointerEvent) => this.handleCropDragStart(e, 'end')}
+                    ></div>
+                  </div>
+                  <!-- Time Labels -->
+                  <span class="crop-time-label start" style="left: ${(this.audioCropStart / Math.max(this.replayDuration, 1)) * 100}%;">
+                    ${formatDuration(this.audioCropStart)}
+                  </span>
+                  <span class="crop-time-label end" style="right: ${100 - (this.audioCropEnd / Math.max(this.replayDuration, 1)) * 100}%;">
+                    ${formatDuration(this.audioCropEnd)}
+                  </span>
+                </div>
+                
+              </div>
+            </div>
+
+            <!-- Style Input -->
+            <div class="kie-form-group">
+              <label>Style / Genre (optional)</label>
+              <input 
+                type="text" 
+                class="kie-input"
+                placeholder="z.B. Pop, Rock, Electronic, Ambient..."
+                .value=${this.kieStyleInput}
+                @input=${(e: Event) => {
+                  this.kieStyleInput = (e.target as HTMLInputElement).value;
+                }}
+              />
+              <div class="hint">Beschreibe den gewünschten Musikstil</div>
+            </div>
+
+            <!-- Lyrics Input -->
+            <div class="kie-form-group">
+              <label>Lyrics / Text (optional)</label>
+              <textarea 
+                class="kie-textarea"
+                placeholder="Schreibe hier Lyrics oder lass es leer für instrumental..."
+                .value=${this.kieLyricsInput}
+                @input=${(e: Event) => {
+                  this.kieLyricsInput = (e.target as HTMLTextAreaElement).value;
+                }}
+              ></textarea>
+              <div class="hint">Lass das Feld leer für einen instrumentalen Song</div>
+            </div>
+
+            <!-- Submit Button -->
+            <div style="text-align: center; margin-top: 8px;">
+              <button 
+                class="modal-btn primary" 
+                @click=${this.handleKieGenerateSong}
+                ?disabled=${this.replayDuration < 1}
+              >
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" fill="currentColor"/>
+                </svg>
+                Song generieren
+              </button>
+              <div style="font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 12px;">
+                Erstellt 2 Song-Varianten basierend auf deinen Eingaben
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    };
+
+    return html`
+      <div id="replay-modal-overlay" @click=${(e: Event) => {
+        if ((e.target as HTMLElement).id === 'replay-modal-overlay') {
+          this.closeReplayModal();
+        }
+      }}>
+        <div id="replay-modal">
+          <div id="replay-modal-content">
+            <button class="close-btn" @click=${this.closeReplayModal} title="Schließen">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z" fill="currentColor"/>
+              </svg>
+            </button>
+            <h2>Replay Buffer</h2>
+            <div class="duration-info">${formatDuration(this.replayDuration)}</div>
+            <div class="duration-label">Aufgenommene Zeit (max. 60 Sekunden)</div>
+            <div class="status-text">${getStatusText()}</div>
+            <div class="modal-buttons">
+              ${this.isReplayPlaying ? html`
+                <button class="modal-btn primary" @click=${this.handleReplayStop}>
+                  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M6 6h12v12H6z" fill="currentColor"/>
+                  </svg>
+                  Stop
+                </button>
+              ` : html`
+                <button class="modal-btn primary" @click=${this.handleReplayPlay} ?disabled=${this.replayDuration < 1}>
+                  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M8 5v14l11-7z" fill="currentColor"/>
+                  </svg>
+                  Abspielen
+                </button>
+              `}
+              <button class="modal-btn secondary" @click=${this.handleReplayDownload} ?disabled=${this.replayDuration < 1}>
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" fill="currentColor"/>
+                </svg>
+                Download
+              </button>
+              <button class="modal-btn secondary" @click=${this.closeReplayModal}>
+                Schließen
+              </button>
+            </div>
+            ${renderKieSection()}
+          </div>
+        </div>
+      </div>
+    `;
   }
 
   private async handleChatSend() {

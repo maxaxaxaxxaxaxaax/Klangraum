@@ -6,6 +6,7 @@ import type { PlaybackState, Prompt } from '../types';
 import type { AudioChunk, GoogleGenAI, LiveMusicFilteredPrompt, LiveMusicServerMessage, LiveMusicSession } from '@google/genai';
 import { decode, decodeAudioData } from './audio';
 import { throttle } from './throttle';
+import { ReplayBuffer } from './ReplayBuffer';
 
 export class LiveMusicHelper extends EventTarget {
 
@@ -29,6 +30,9 @@ export class LiveMusicHelper extends EventTarget {
 
   private prompts: Map<string, Prompt>;
 
+  // 60-second replay buffer for capturing audio
+  private replayBuffer: ReplayBuffer;
+
   constructor(ai: GoogleGenAI, model: string) {
     super();
     this.ai = ai;
@@ -36,6 +40,7 @@ export class LiveMusicHelper extends EventTarget {
     this.prompts = new Map();
     this.audioContext = new AudioContext({ sampleRate: 48000 });
     this.outputNode = this.audioContext.createGain();
+    this.replayBuffer = new ReplayBuffer(48000, 2, 60);
   }
 
   private getSession(): Promise<LiveMusicSession> {
@@ -87,6 +92,10 @@ export class LiveMusicHelper extends EventTarget {
       48000,
       2,
     );
+    
+    // Write audio to replay buffer for later playback
+    this.replayBuffer.writeAudioBuffer(audioBuffer);
+    
     const source = this.audioContext.createBufferSource();
     source.buffer = audioBuffer;
     source.connect(this.outputNode);
@@ -202,6 +211,63 @@ export class LiveMusicHelper extends EventTarget {
     if (wasPlaying) {
       await this.play();
     }
+  }
+
+  /**
+   * Get the replay buffer instance.
+   */
+  public getReplayBuffer(): ReplayBuffer {
+    return this.replayBuffer;
+  }
+
+  /**
+   * Get the duration of recorded audio in the replay buffer.
+   */
+  public getReplayDuration(): number {
+    return this.replayBuffer.getRecordedDuration();
+  }
+
+  /**
+   * Play the replay buffer through the audio context.
+   * @returns Promise that resolves when playback ends
+   */
+  public async playReplay(): Promise<void> {
+    // Pause live music if playing
+    const wasPlaying = this.playbackState === 'playing';
+    if (wasPlaying) {
+      this.pause();
+    }
+    
+    // Resume audio context if suspended
+    await this.audioContext.resume();
+    
+    // Play the replay buffer
+    await this.replayBuffer.play(this.audioContext);
+    
+    // Dispatch event when replay ends
+    this.dispatchEvent(new CustomEvent('replay-ended'));
+  }
+
+  /**
+   * Stop replay playback if currently playing.
+   */
+  public stopReplay(): void {
+    this.replayBuffer.stop();
+  }
+
+  /**
+   * Check if replay is currently playing.
+   */
+  public isReplayPlaying(): boolean {
+    return this.replayBuffer.getIsPlaying();
+  }
+
+  /**
+   * Download the replay buffer as a WAV file.
+   */
+  public downloadReplay(): void {
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+    this.replayBuffer.downloadAsWav(`klanggraum-replay-${timestamp}.wav`);
   }
 
 }

@@ -31,6 +31,13 @@ export interface KieSongResult {
   // Local paths after saving
   localAudioPath?: string;
   localImagePath?: string;
+  localSourceAudioPath?: string;  // Pfad zum lokal gespeicherten Source-Audio
+  // Generation metadata
+  style?: string;
+  lyrics?: string;
+  createdAt?: number;
+  // Source audio that was used for generation
+  sourceAudioUrl?: string;
 }
 
 export interface KieStatusResponse {
@@ -221,7 +228,7 @@ export async function pollUntilComplete(
 /**
  * Save a song locally via the Vite dev server API.
  */
-export async function saveSongLocally(song: KieSongResult, songId: string): Promise<KieSongResult> {
+export async function saveSongLocally(song: KieSongResult, songId: string, sourceAudioUrl?: string): Promise<KieSongResult> {
   try {
     const response = await fetch('/api/save-song', {
       method: 'POST',
@@ -229,6 +236,7 @@ export async function saveSongLocally(song: KieSongResult, songId: string): Prom
       body: JSON.stringify({
         audio_url: song.audio_url,
         image_url: song.image_url,
+        source_audio_url: sourceAudioUrl,
         songId,
       }),
     });
@@ -243,6 +251,7 @@ export async function saveSongLocally(song: KieSongResult, songId: string): Prom
       ...song,
       localAudioPath: result.audioPath,
       localImagePath: result.imagePath,
+      localSourceAudioPath: result.sourceAudioPath,
     };
   } catch (error) {
     console.warn('Failed to save song locally:', error);
@@ -268,6 +277,9 @@ export async function loadLocalSongs(): Promise<KieSongResult[]> {
       duration: 0, // Duration not stored locally
       localAudioPath: song.audioPath,
       localImagePath: song.imagePath,
+      localSourceAudioPath: song.sourceAudioPath,
+      // Setze sourceAudioUrl auf den lokalen Pfad, wenn verfügbar
+      sourceAudioUrl: song.sourceAudioPath || undefined,
     }));
   } catch (error) {
     console.warn('Failed to load local songs:', error);
@@ -286,6 +298,7 @@ export async function deleteLocalSong(song: KieSongResult): Promise<boolean> {
       body: JSON.stringify({
         audioPath: song.localAudioPath,
         imagePath: song.localImagePath,
+        sourceAudioPath: song.localSourceAudioPath,
       }),
     });
 
@@ -319,15 +332,25 @@ export async function generateSongFromBlob(
       }
     });
 
-    // Step 4: Save songs locally
+    // Step 4: Save songs locally (including source audio)
     onStatusChange?.('polling', 'Songs werden gespeichert...');
     const savedSongs = await Promise.all(
-      songs.map((song, index) => saveSongLocally(song, `${taskId}-${index}`))
+      songs.map((song, index) => saveSongLocally(song, `${taskId}-${index}`, audioUrl))
     );
 
-    console.log('Final songs to return:', JSON.stringify(savedSongs, null, 2));
+    // Step 5: Add metadata to songs
+    const songsWithMetadata = savedSongs.map(song => ({
+      ...song,
+      style: options.style || '',
+      lyrics: options.prompt || '',
+      createdAt: Date.now(),
+      // Verwende lokalen Pfad wenn verfügbar, sonst die temporäre URL
+      sourceAudioUrl: song.localSourceAudioPath || audioUrl,
+    }));
+
+    console.log('Final songs to return:', JSON.stringify(songsWithMetadata, null, 2));
     onStatusChange?.('complete', 'Fertig!');
-    return savedSongs;
+    return songsWithMetadata;
 
   } catch (error) {
     onStatusChange?.('error', error instanceof Error ? error.message : 'Unbekannter Fehler');

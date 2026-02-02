@@ -67,7 +67,7 @@ export function saveSongsPlugin(): Plugin {
         req.on('data', chunk => { body += chunk; });
         req.on('end', async () => {
           try {
-            const { audio_url, image_url, songId } = JSON.parse(body);
+            const { audio_url, image_url, source_audio_url, songId } = JSON.parse(body);
 
             if (!audio_url || !songId) {
               res.statusCode = 400;
@@ -78,9 +78,11 @@ export function saveSongsPlugin(): Plugin {
             const timestamp = Date.now();
             const audioFileName = `song-${songId}-${timestamp}.mp3`;
             const imageFileName = `cover-${songId}-${timestamp}.jpg`;
+            const sourceAudioFileName = `source-${songId}-${timestamp}.wav`;
 
             const audioPath = path.join(SONGS_DIR, audioFileName);
             const imagePath = path.join(SONGS_DIR, imageFileName);
+            const sourceAudioPath = path.join(SONGS_DIR, sourceAudioFileName);
 
             // Download audio file
             await downloadFile(audio_url, audioPath);
@@ -90,14 +92,27 @@ export function saveSongsPlugin(): Plugin {
               await downloadFile(image_url, imagePath);
             }
 
+            // Download source audio file if provided
+            let sourceAudioSaved = false;
+            if (source_audio_url) {
+              try {
+                await downloadFile(source_audio_url, sourceAudioPath);
+                sourceAudioSaved = true;
+              } catch (err) {
+                console.warn('Failed to download source audio:', err);
+              }
+            }
+
             res.statusCode = 200;
             res.setHeader('Content-Type', 'application/json');
             res.end(JSON.stringify({
               success: true,
               audioPath: `/Songs/${audioFileName}`,
               imagePath: image_url ? `/Songs/${imageFileName}` : null,
+              sourceAudioPath: sourceAudioSaved ? `/Songs/${sourceAudioFileName}` : null,
               audioFileName,
               imageFileName: image_url ? imageFileName : null,
+              sourceAudioFileName: sourceAudioSaved ? sourceAudioFileName : null,
             }));
           } catch (error) {
             console.error('Error saving song:', error);
@@ -117,7 +132,7 @@ export function saveSongsPlugin(): Plugin {
 
         try {
           const files = fs.readdirSync(SONGS_DIR);
-          const songs: Array<{ audioPath: string; imagePath: string | null; songId: string; timestamp: number }> = [];
+          const songs: Array<{ audioPath: string; imagePath: string | null; sourceAudioPath: string | null; songId: string; timestamp: number }> = [];
 
           // Group files by songId and timestamp
           const audioFiles = files.filter(f => f.startsWith('song-') && f.endsWith('.mp3'));
@@ -129,11 +144,14 @@ export function saveSongsPlugin(): Plugin {
               const songId = match[1];
               const timestamp = parseInt(match[2], 10);
               const imageFile = `cover-${songId}-${timestamp}.jpg`;
+              const sourceAudioFile = `source-${songId}-${timestamp}.wav`;
               const hasImage = files.includes(imageFile);
+              const hasSourceAudio = files.includes(sourceAudioFile);
 
               songs.push({
                 audioPath: `/Songs/${audioFile}`,
                 imagePath: hasImage ? `/Songs/${imageFile}` : null,
+                sourceAudioPath: hasSourceAudio ? `/Songs/${sourceAudioFile}` : null,
                 songId,
                 timestamp,
               });
@@ -165,7 +183,7 @@ export function saveSongsPlugin(): Plugin {
         req.on('data', chunk => { body += chunk; });
         req.on('end', () => {
           try {
-            const { audioPath, imagePath } = JSON.parse(body);
+            const { audioPath, imagePath, sourceAudioPath } = JSON.parse(body);
 
             if (audioPath) {
               const fullAudioPath = path.join(__dirname, audioPath);
@@ -178,6 +196,13 @@ export function saveSongsPlugin(): Plugin {
               const fullImagePath = path.join(__dirname, imagePath);
               if (fs.existsSync(fullImagePath)) {
                 fs.unlinkSync(fullImagePath);
+              }
+            }
+
+            if (sourceAudioPath) {
+              const fullSourceAudioPath = path.join(__dirname, sourceAudioPath);
+              if (fs.existsSync(fullSourceAudioPath)) {
+                fs.unlinkSync(fullSourceAudioPath);
               }
             }
 

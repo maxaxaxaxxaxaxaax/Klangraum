@@ -635,6 +635,163 @@ export class PromptDjMidi extends LitElement {
       font-size: 12px;
       padding: 20px;
     }
+    .song-item-clickable {
+      cursor: pointer;
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+    #song-detail-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.85);
+      z-index: 2000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(10px);
+    }
+    .song-detail-content {
+      background: rgba(30, 30, 30, 0.95);
+      border: 2px solid #fff;
+      border-radius: 16px;
+      padding: 24px;
+      max-width: 500px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+      font-family: 'Satoshi', sans-serif;
+    }
+    .song-detail-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    .song-detail-cover {
+      width: 120px;
+      height: 120px;
+      border-radius: 12px;
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+    .song-detail-info {
+      flex: 1;
+    }
+    .song-detail-title {
+      font-size: 20px;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+    .song-detail-duration {
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.6);
+      margin-bottom: 12px;
+    }
+    .song-detail-date {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.4);
+    }
+    .song-detail-section {
+      margin-bottom: 16px;
+    }
+    .song-detail-section h4 {
+      font-size: 12px;
+      color: #FD7B2E;
+      margin: 0 0 8px 0;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .song-detail-section p {
+      font-size: 14px;
+      color: #fff;
+      margin: 0;
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .song-detail-section p.empty {
+      color: rgba(255, 255, 255, 0.4);
+      font-style: italic;
+    }
+    .song-detail-audio {
+      width: 100%;
+      height: 40px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.05);
+    }
+    .song-detail-audio::-webkit-media-controls-panel {
+      background: rgba(255, 255, 255, 0.1);
+    }
+    .song-detail-buttons {
+      display: flex;
+      gap: 12px;
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .song-detail-btn {
+      flex: 1;
+      padding: 12px 16px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      background: transparent;
+      color: #fff;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .song-detail-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: #fff;
+    }
+    .song-detail-btn.primary {
+      background: #FD7B2E;
+      border-color: #FD7B2E;
+    }
+    .song-detail-btn.primary:hover {
+      background: #e56a20;
+    }
+    .song-detail-btn svg {
+      width: 18px;
+      height: 18px;
+    }
+    .song-detail-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      background: rgba(0, 0, 0, 0.5);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .song-detail-close:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: #fff;
+    }
+    .song-detail-close svg {
+      width: 20px;
+      height: 20px;
+    }
     #debug-panel {
       position: absolute;
       top: 50px;
@@ -893,7 +1050,7 @@ export class PromptDjMidi extends LitElement {
     }
     .circle-label {
       position: absolute;
-      transform: translate(-50%, -50%);
+      transform: translateX(-50%);
       font-size: 1.5vmin;
       font-weight: 500;
       color: rgba(255, 255, 255, 0.7);
@@ -1438,6 +1595,7 @@ export class PromptDjMidi extends LitElement {
 
   // Songs panel state
   @state() private showSongsPanel = false;
+  @state() private selectedSongIndex: number | null = null;
   
   // KIE.ai input fields
   @state() private kieStyleInput = '';
@@ -2527,6 +2685,107 @@ Always respond only in the following JSON format (exactly 5 objects):
     document.body.removeChild(link);
   }
 
+  private openSongDetail(index: number) {
+    this.selectedSongIndex = index;
+  }
+
+  private closeSongDetail() {
+    this.selectedSongIndex = null;
+  }
+
+  private formatDate(timestamp: number | undefined): string {
+    if (!timestamp) return '';
+    const date = new Date(timestamp);
+    return date.toLocaleDateString('de-DE', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  }
+
+  private renderSongDetailModal() {
+    if (this.selectedSongIndex === null) return null;
+
+    const song = this.kieGeneratedSongs[this.selectedSongIndex];
+    if (!song) return null;
+
+    return html`
+      <div id="song-detail-modal" @click=${(e: Event) => {
+        if ((e.target as HTMLElement).id === 'song-detail-modal') {
+          this.closeSongDetail();
+        }
+      }}>
+        <button class="song-detail-close" @click=${this.closeSongDetail} title="Schließen">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+          </svg>
+        </button>
+        <div class="song-detail-content">
+          <div class="song-detail-header">
+            <img class="song-detail-cover" src="${song.image_url}" alt="Cover" />
+            <div class="song-detail-info">
+              <div class="song-detail-title">Song ${this.selectedSongIndex + 1}</div>
+              <div class="song-detail-duration">${this.formatSongDuration(song.duration)}</div>
+              ${song.createdAt ? html`
+                <div class="song-detail-date">Erstellt: ${this.formatDate(song.createdAt)}</div>
+              ` : ''}
+            </div>
+          </div>
+
+          <div class="song-detail-section">
+            <h4>Style / Prompt</h4>
+            <p class="${!song.style ? 'empty' : ''}">${song.style || 'Kein Style angegeben'}</p>
+          </div>
+
+          <div class="song-detail-section">
+            <h4>Lyrics</h4>
+            <p class="${!song.lyrics ? 'empty' : ''}">${song.lyrics || 'Instrumental (keine Lyrics)'}</p>
+          </div>
+
+          <div class="song-detail-section">
+            <h4>Source Audio (Input für KI)</h4>
+            ${song.sourceAudioUrl ? html`
+              <audio
+                class="song-detail-audio"
+                controls
+                src="${song.sourceAudioUrl}"
+              ></audio>
+            ` : html`
+              <p class="empty">Kein Source-Audio verfügbar</p>
+            `}
+          </div>
+
+          <div class="song-detail-buttons">
+            <button
+              class="song-detail-btn ${this.kiePlayingSongIndex === this.selectedSongIndex ? 'primary' : ''}"
+              @click=${() => this.playSongFromPanel(this.selectedSongIndex!)}>
+              ${this.kiePlayingSongIndex === this.selectedSongIndex ? html`
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                  <rect x="6" y="4" width="4" height="16"/>
+                  <rect x="14" y="4" width="4" height="16"/>
+                </svg>
+                Stop
+              ` : html`
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M8 5v14l11-7z"/>
+                </svg>
+                Abspielen
+              `}
+            </button>
+            <button class="song-detail-btn" @click=${() => this.downloadSong(this.selectedSongIndex!)}>
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+              </svg>
+              Download
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
   private renderSongsPanel() {
     if (!this.showSongsPanel) return null;
 
@@ -2540,10 +2799,12 @@ Always respond only in the following JSON format (exactly 5 objects):
           </div>
         ` : this.kieGeneratedSongs.map((song, index) => html`
           <div class="song-item">
-            <img class="song-item-cover" src="${song.image_url}" alt="Cover" />
-            <div class="song-item-info">
-              <div class="song-item-title">Song ${index + 1}</div>
-              <div class="song-item-duration">${this.formatSongDuration(song.duration)}</div>
+            <div class="song-item-clickable" @click=${() => this.openSongDetail(index)} title="Details anzeigen">
+              <img class="song-item-cover" src="${song.image_url}" alt="Cover" />
+              <div class="song-item-info">
+                <div class="song-item-title">Song ${index + 1}</div>
+                <div class="song-item-duration">${this.formatSongDuration(song.duration)}</div>
+              </div>
             </div>
             <div class="song-item-buttons">
               <button
@@ -2711,7 +2972,7 @@ Always respond only in the following JSON format (exactly 5 objects):
   /**
    * Set generated songs from KIE.ai
    */
-  public setKieGeneratedSongs(songs: Array<{ audio_url: string; image_url: string; duration: number }>) {
+  public setKieGeneratedSongs(songs: KieSongResult[]) {
     this.kieGeneratedSongs = songs;
     this.kieStatus = 'complete';
     this.saveSongsToStorage();
@@ -3382,7 +3643,8 @@ Always respond only in the following JSON format (exactly 5 objects):
       <div id="debug-panel" class=${classMap({ visible: this.showDebugPanel })}>
         ${this.renderDebugPanel()}
       </div>
-      ${this.showReplayModal ? this.renderReplayModal() : ''}`;
+      ${this.showReplayModal ? this.renderReplayModal() : ''}
+      ${this.renderSongDetailModal()}`;
   }
 
   private renderReplayModal() {
@@ -4016,7 +4278,16 @@ Always respond only in the following JSON format (exactly 5 objects):
       const centerY = this.containerSize / 2 + circle.ringOffsetY;
       const diameter = radius * 2;
       const isActive = circleIndex === this.activeCircleIndex;
-      const outlineColor = isActive ? '#FD7B2E' : 'rgba(255, 255, 255, 0.3)';
+
+      // Calculate distance-based opacity for passive circles
+      const distanceFromActive = Math.abs(circleIndex - this.activeCircleIndex);
+      const distanceOpacity = distanceFromActive === 0
+        ? 1 // aktiver Kreis
+        : distanceFromActive === 1
+          ? 0.25 // gerade so sichtbar
+          : 0.08; // nur angedeutet
+
+      const outlineColor = isActive ? '#FD7B2E' : `rgba(255, 255, 255, ${distanceOpacity})`;
       const outlineStyle = styleMap({
         left: `${centerX}px`,
         top: `${centerY}px`,
@@ -4026,14 +4297,47 @@ Always respond only in the following JSON format (exactly 5 objects):
         borderColor: outlineColor,
       });
       
-      // For passive circles, also render a label in the center
+      // For passive circles, also render a label - position it outside the active circle
       if (!isActive) {
-        const labelStyle = styleMap({
-          left: `${centerX}px`,
-          top: `${centerY}px`,
-          opacity: `${circle.expansionProgress}`,
-        });
         const circleName = this.getCircleName(circleIndex);
+
+        // Get active circle info to check for overlap
+        const activeCircle = this.genreCircleStack[this.activeCircleIndex];
+        const activeRadius = activeCircle ? (this.containerSize * activeCircle.radiusMultiplier) : 0;
+        const activeCenterX = activeCircle ? (this.containerSize / 2 + activeCircle.ringOffsetX) : 0;
+        const activeCenterY = activeCircle ? (this.containerSize / 2 + activeCircle.ringOffsetY) : 0;
+
+        // Helper to check if a point is inside the active circle
+        const isInsideActiveCircle = (x: number, y: number): boolean => {
+          if (!activeCircle) return false;
+          const dx = x - activeCenterX;
+          const dy = y - activeCenterY;
+          return Math.sqrt(dx * dx + dy * dy) < activeRadius + 20; // 20px padding for label
+        };
+
+        // Try different label positions: top, bottom, left, right
+        const labelOffset = radius + 15;
+        const positions = [
+          { x: centerX, y: centerY - labelOffset }, // top
+          { x: centerX, y: centerY + labelOffset }, // bottom
+          { x: centerX - labelOffset, y: centerY }, // left
+          { x: centerX + labelOffset, y: centerY }, // right
+        ];
+
+        // Find first position that's outside the active circle
+        let labelPosition = positions.find(pos => !isInsideActiveCircle(pos.x, pos.y));
+
+        // If all positions are inside the active circle, don't show the label
+        if (!labelPosition) {
+          return html`<div class="genre-circle-outline" style=${outlineStyle}></div>`;
+        }
+
+        const labelStyle = styleMap({
+          left: `${labelPosition.x}px`,
+          top: `${labelPosition.y}px`,
+          opacity: `${circle.expansionProgress * distanceOpacity}`,
+        });
+
         return html`
           <div class="genre-circle-outline" style=${outlineStyle}></div>
           <div class="circle-label" style=${labelStyle}>${circleName}</div>
@@ -4127,8 +4431,14 @@ Always respond only in the following JSON format (exactly 5 objects):
         const baseFontSize = 12;
         const fontSize = baseFontSize * fisheyeScale;
         
-        // For active circles, use weight-based opacity
-        const baseOpacity = isActive ? (prompt.weight > 0.1 ? 1 : 0.3) : 0.4;
+        // For active circles, use weight-based opacity; for passive circles, use distance-based opacity
+        const distanceFromActive = Math.abs(item.circleIndex - this.activeCircleIndex);
+        const distanceOpacity = distanceFromActive === 0
+          ? 1 // aktiver Kreis
+          : distanceFromActive === 1
+            ? 0.25 // gerade so sichtbar
+            : 0.08; // nur angedeutet
+        const baseOpacity = isActive ? (prompt.weight > 0.1 ? 1 : 0.3) : distanceOpacity;
         const opacity = baseOpacity * circle.expansionProgress;
         
         // Text color

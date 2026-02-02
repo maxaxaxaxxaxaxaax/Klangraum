@@ -13,6 +13,7 @@ import type { PlaybackState, Prompt } from '../types';
 import subGenresData from '../sub-genres.json';
 import mainGenresData from '../main-genres.json';
 import { geminiAgent } from '../index';
+import { loadLocalSongs, deleteLocalSong, type KieSongResult } from '../utils/KieApiClient';
 
 // Hierarchical genre circle system
 interface GenreCircle {
@@ -29,6 +30,8 @@ interface GenreCircle {
 /** The grid of prompt inputs. */
 @customElement('prompt-dj-midi')
 export class PromptDjMidi extends LitElement {
+  private static readonly SONGS_STORAGE_KEY = 'klanggraum-generated-songs';
+
   static override styles = css`
     :host {
       height: 100%;
@@ -486,6 +489,151 @@ export class PromptDjMidi extends LitElement {
       height: 4px;
       background: #fff;
       border-radius: 2px;
+    }
+    #header-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    #songs-button {
+      position: relative;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 2px solid #ffffff;
+      background: transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    #songs-button:hover {
+      transform: scale(1.05);
+      border-color: rgba(255, 255, 255, 0.8);
+    }
+    #songs-button:active {
+      transform: scale(0.95);
+    }
+    #songs-button svg {
+      width: 20px;
+      height: 20px;
+    }
+    #songs-button .badge {
+      position: absolute;
+      top: -6px;
+      right: -6px;
+      background: #FD7B2E;
+      color: #fff;
+      font-size: 10px;
+      font-weight: bold;
+      min-width: 16px;
+      height: 16px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 4px;
+      font-family: 'Satoshi', sans-serif;
+    }
+    #songs-panel {
+      position: absolute;
+      top: 60px;
+      right: 0;
+      background: rgba(0, 0, 0, 0.9);
+      border: 2px solid #fff;
+      border-radius: 12px;
+      padding: 12px;
+      min-width: 280px;
+      max-width: 350px;
+      max-height: 400px;
+      overflow-y: auto;
+      z-index: 1000;
+      backdrop-filter: blur(10px);
+      font-family: 'Satoshi', sans-serif;
+    }
+    #songs-panel h3 {
+      margin: 0 0 12px 0;
+      font-size: 14px;
+      color: #fff;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      padding-bottom: 8px;
+    }
+    .song-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+      margin-bottom: 8px;
+      transition: background 0.2s;
+    }
+    .song-item:last-child {
+      margin-bottom: 0;
+    }
+    .song-item:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+    .song-item-cover {
+      width: 48px;
+      height: 48px;
+      border-radius: 6px;
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+    .song-item-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .song-item-title {
+      font-size: 12px;
+      color: #fff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .song-item-duration {
+      font-size: 10px;
+      color: rgba(255, 255, 255, 0.6);
+      margin-top: 2px;
+    }
+    .song-item-buttons {
+      display: flex;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+    .song-item-button {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      background: transparent;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .song-item-button:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: #fff;
+    }
+    .song-item-button.playing {
+      background: #FD7B2E;
+      border-color: #FD7B2E;
+    }
+    .song-item-button svg {
+      width: 14px;
+      height: 14px;
+    }
+    .songs-empty {
+      text-align: center;
+      color: rgba(255, 255, 255, 0.5);
+      font-size: 12px;
+      padding: 20px;
     }
     #debug-panel {
       position: absolute;
@@ -1284,9 +1432,12 @@ export class PromptDjMidi extends LitElement {
   // KIE.ai song generation state
   @state() private kieStatus: 'idle' | 'uploading' | 'generating' | 'polling' | 'complete' | 'error' = 'idle';
   @state() private kieStatusMessage = '';
-  @state() private kieGeneratedSongs: Array<{ audio_url: string; image_url: string; duration: number }> = [];
+  @state() private kieGeneratedSongs: KieSongResult[] = [];
   @state() private kiePlayingSongIndex: number | null = null;
   private kieAudioElement: HTMLAudioElement | null = null;
+
+  // Songs panel state
+  @state() private showSongsPanel = false;
   
   // KIE.ai input fields
   @state() private kieStyleInput = '';
@@ -1370,6 +1521,43 @@ Always respond only in the following JSON format (exactly 5 objects):
   private boundTouchStart = this.handleTouchStart.bind(this);
   private boundTouchMove = this.handleTouchMove.bind(this);
   private boundTouchEnd = this.handleTouchEnd.bind(this);
+
+  override connectedCallback() {
+    super.connectedCallback();
+    this.loadSongsFromStorage();
+  }
+
+  private loadSongsFromStorage() {
+    try {
+      const stored = localStorage.getItem(PromptDjMidi.SONGS_STORAGE_KEY);
+      if (stored) {
+        this.kieGeneratedSongs = JSON.parse(stored);
+      }
+    } catch (e) {
+      console.warn('Failed to load songs from storage:', e);
+    }
+  }
+
+  private saveSongsToStorage() {
+    try {
+      localStorage.setItem(
+        PromptDjMidi.SONGS_STORAGE_KEY,
+        JSON.stringify(this.kieGeneratedSongs)
+      );
+    } catch (e) {
+      console.warn('Failed to save songs to storage:', e);
+    }
+  }
+
+  private deleteSongFromPanel(index: number) {
+    this.kieGeneratedSongs = this.kieGeneratedSongs.filter((_, i) => i !== index);
+    this.saveSongsToStorage();
+  }
+
+  private clearAllSongs() {
+    this.kieGeneratedSongs = [];
+    this.saveSongsToStorage();
+  }
 
   override firstUpdated() {
     // Defer initialization to next frame to avoid triggering update during update
@@ -2293,6 +2481,101 @@ Always respond only in the following JSON format (exactly 5 objects):
     this.showVolumeControl = !this.showVolumeControl;
   }
 
+  private toggleSongsPanel() {
+    this.showSongsPanel = !this.showSongsPanel;
+  }
+
+  private formatSongDuration(seconds: number): string {
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  }
+
+  private playSongFromPanel(index: number) {
+    if (this.kiePlayingSongIndex === index) {
+      // Stop current song
+      if (this.kieAudioElement) {
+        this.kieAudioElement.pause();
+        this.kieAudioElement = null;
+      }
+      this.kiePlayingSongIndex = null;
+    } else {
+      // Stop any currently playing song
+      if (this.kieAudioElement) {
+        this.kieAudioElement.pause();
+      }
+      // Play new song
+      const song = this.kieGeneratedSongs[index];
+      this.kieAudioElement = new Audio(song.audio_url);
+      this.kieAudioElement.play();
+      this.kiePlayingSongIndex = index;
+      this.kieAudioElement.onended = () => {
+        this.kiePlayingSongIndex = null;
+        this.kieAudioElement = null;
+      };
+    }
+  }
+
+  private downloadSong(index: number) {
+    const song = this.kieGeneratedSongs[index];
+    const link = document.createElement('a');
+    link.href = song.audio_url;
+    link.download = `klanggraum-song-${index + 1}.mp3`;
+    link.target = '_blank';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
+  private renderSongsPanel() {
+    if (!this.showSongsPanel) return null;
+
+    return html`
+      <div id="songs-panel">
+        <h3>Generated Songs</h3>
+        ${this.kieGeneratedSongs.length === 0 ? html`
+          <div class="songs-empty">
+            No songs generated yet.<br/>
+            Use Replay to create songs!
+          </div>
+        ` : this.kieGeneratedSongs.map((song, index) => html`
+          <div class="song-item">
+            <img class="song-item-cover" src="${song.image_url}" alt="Cover" />
+            <div class="song-item-info">
+              <div class="song-item-title">Song ${index + 1}</div>
+              <div class="song-item-duration">${this.formatSongDuration(song.duration)}</div>
+            </div>
+            <div class="song-item-buttons">
+              <button
+                class="song-item-button ${this.kiePlayingSongIndex === index ? 'playing' : ''}"
+                @click=${() => this.playSongFromPanel(index)}
+                title="${this.kiePlayingSongIndex === index ? 'Stop' : 'Play'}">
+                ${this.kiePlayingSongIndex === index ? html`
+                  <svg viewBox="0 0 24 24" fill="currentColor">
+                    <rect x="6" y="4" width="4" height="16"/>
+                    <rect x="14" y="4" width="4" height="16"/>
+                  </svg>
+                ` : html`
+                  <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M8 5v14l11-7z"/>
+                  </svg>
+                `}
+              </button>
+              <button
+                class="song-item-button"
+                @click=${() => this.downloadSong(index)}
+                title="Download">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+        `)}
+      </div>
+    `;
+  }
+
   private handleDiceClick() {
     // Randomize the ring position to create a random mix
     const activeCircle = this.getActiveCircle();
@@ -2431,6 +2714,7 @@ Always respond only in the following JSON format (exactly 5 objects):
   public setKieGeneratedSongs(songs: Array<{ audio_url: string; image_url: string; duration: number }>) {
     this.kieGeneratedSongs = songs;
     this.kieStatus = 'complete';
+    this.saveSongsToStorage();
   }
 
   /**
@@ -3004,21 +3288,32 @@ Always respond only in the following JSON format (exactly 5 objects):
       ` : ''}
       <div id="header">
         <img id="header-logo" src="/Logo/Logo.png" alt="Logo" />
-        <div id="volume-control" class=${classMap({ visible: this.showVolumeControl })}>
-          <div id="volume-icon" @click=${this.toggleVolumeControl}>
+        <div id="header-controls">
+          <div id="songs-button" @click=${this.toggleSongsPanel} title="Generated Songs">
+            ${this.kieGeneratedSongs.length > 0 ? html`
+              <span class="badge">${this.kieGeneratedSongs.length}</span>
+            ` : ''}
             <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z" fill="currentColor"/>
+              <path d="M15 6H3v2h12V6zm0 4H3v2h12v-2zM3 16h8v-2H3v2zM17 6v8.18c-.31-.11-.65-.18-1-.18-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3V8h3V6h-5z" fill="currentColor"/>
             </svg>
+            ${this.renderSongsPanel()}
           </div>
-          <input
-            id="volume-slider-horizontal"
-            type="range"
-            min="0"
-            max="100"
-            value=${this.volume * 100}
-            @input=${this.handleVolumeChange}
-            @change=${this.handleVolumeChange}
-          />
+          <div id="volume-control" class=${classMap({ visible: this.showVolumeControl })}>
+            <div id="volume-icon" @click=${this.toggleVolumeControl}>
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z" fill="currentColor"/>
+              </svg>
+            </div>
+            <input
+              id="volume-slider-horizontal"
+              type="range"
+              min="0"
+              max="100"
+              value=${this.volume * 100}
+              @input=${this.handleVolumeChange}
+              @change=${this.handleVolumeChange}
+            />
+          </div>
         </div>
       </div>
       <div id="media-controls">

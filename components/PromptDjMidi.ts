@@ -553,6 +553,129 @@ export class PromptDjMidi extends LitElement {
       backdrop-filter: blur(10px);
       font-family: 'Satoshi', sans-serif;
     }
+    #genre-selector-button {
+      position: relative;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 2px solid #ffffff;
+      background: transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    #genre-selector-button:hover {
+      transform: scale(1.05);
+      border-color: rgba(255, 255, 255, 0.8);
+    }
+    #genre-selector-button:active {
+      transform: scale(0.95);
+    }
+    #genre-selector-button svg {
+      width: 20px;
+      height: 20px;
+    }
+    #genre-selector-panel {
+      position: absolute;
+      top: 60px;
+      right: 0;
+      background: rgba(0, 0, 0, 0.9);
+      border: 2px solid #fff;
+      border-radius: 12px;
+      padding: 12px;
+      min-width: 280px;
+      max-width: 350px;
+      max-height: 400px;
+      overflow-y: auto;
+      z-index: 1000;
+      backdrop-filter: blur(10px);
+      font-family: 'Satoshi', sans-serif;
+      display: none;
+    }
+    #genre-selector-panel.visible {
+      display: block;
+    }
+    #genre-selector-panel h3 {
+      margin: 0 0 12px 0;
+      font-size: 14px;
+      color: #fff;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      padding-bottom: 8px;
+    }
+    .genre-selector-controls {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .genre-selector-controls button {
+      flex: 1;
+      padding: 6px 12px;
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: 500;
+      transition: all 0.2s;
+      font-family: 'Satoshi', sans-serif;
+    }
+    .genre-selector-controls button:hover {
+      background: rgba(255, 255, 255, 0.2);
+      border-color: rgba(255, 255, 255, 0.5);
+    }
+    .genre-selector-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .genre-selector-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .genre-selector-item:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+    .genre-selector-checkbox {
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(255, 255, 255, 0.5);
+      border-radius: 4px;
+      background: transparent;
+      position: relative;
+      flex-shrink: 0;
+      transition: all 0.2s;
+    }
+    .genre-selector-checkbox.checked {
+      background: #FD7B2E;
+      border-color: #FD7B2E;
+    }
+    .genre-selector-checkbox.checked::after {
+      content: '';
+      position: absolute;
+      left: 5px;
+      top: 2px;
+      width: 4px;
+      height: 8px;
+      border: solid #fff;
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg);
+    }
+    .genre-selector-label {
+      flex: 1;
+      font-size: 12px;
+      color: #fff;
+      user-select: none;
+    }
     #songs-panel h3 {
       margin: 0 0 12px 0;
       font-size: 14px;
@@ -1597,6 +1720,10 @@ export class PromptDjMidi extends LitElement {
   @state() private showSongsPanel = false;
   @state() private selectedSongIndex: number | null = null;
   
+  // Genre selector state
+  @state() private showGenreSelector = false;
+  @state() private selectedGenreIds = new Set<string>();
+  
   // KIE.ai input fields
   @state() private kieStyleInput = '';
   @state() private kieLyricsInput = '';
@@ -1660,6 +1787,10 @@ Always respond only in the following JSON format (exactly 5 objects):
     // Initialize system instruction from agent
     this.systemInstruction = geminiAgent.getSystemInstruction();
     this.originalPrompts = new Map(initialPrompts);
+    
+    // Initialize selectedGenreIds with all genres from mainGenresData
+    const mainGenres = mainGenresData as any[];
+    this.selectedGenreIds = new Set(mainGenres.map((g: any) => g.id));
     
     // Initialize with the first genre circle
     this.genreCircleStack = [{
@@ -2643,6 +2774,96 @@ Always respond only in the following JSON format (exactly 5 objects):
     this.showSongsPanel = !this.showSongsPanel;
   }
 
+  private toggleGenreSelector() {
+    this.showGenreSelector = !this.showGenreSelector;
+  }
+
+  private filterPromptsBySelectedGenres(prompts: Map<string, Prompt>): Map<string, Prompt> {
+    const filteredPrompts = new Map<string, Prompt>();
+    const mainGenres = mainGenresData as any[];
+
+    for (const [promptId, prompt] of prompts.entries()) {
+      // Find the genre ID for this prompt
+      const genre = mainGenres.find((g: any) => {
+        // Check if promptId matches the genre ID pattern
+        return promptId === `prompt-${g.id}` || prompt.text === g.prompt;
+      });
+
+      if (genre && this.selectedGenreIds.has(genre.id)) {
+        filteredPrompts.set(promptId, prompt);
+      }
+    }
+
+    return filteredPrompts;
+  }
+
+  private regenerateCircleWithSelectedGenres() {
+    // Filter original prompts based on selected genres
+    const filteredPrompts = this.filterPromptsBySelectedGenres(this.originalPrompts);
+
+    // If no genres selected, don't regenerate (or could show empty circle)
+    if (filteredPrompts.size === 0) {
+      return;
+    }
+
+    // Update prompts
+    this.prompts = new Map(filteredPrompts);
+    
+    // Reset to first circle only with filtered prompts
+    this.genreCircleStack = [{
+      id: 'circle-0',
+      prompts: new Map(filteredPrompts),
+      ringOffsetX: 0,
+      ringOffsetY: 0,
+      disabledGenres: new Set(),
+      isExpanding: false,
+      expansionProgress: 1.0,
+      radiusMultiplier: 0.35,
+    }];
+    this.activeCircleIndex = 0;
+    
+    // Reset ring offsets
+    this.ringOffsetX = 0;
+    this.ringOffsetY = 0;
+    
+    // Update weights and trigger UI update
+    this.updateWeightsFromPosition();
+    this.requestUpdate();
+    
+    // Dispatch prompts-changed event to update audio
+    this.dispatchEvent(new CustomEvent('prompts-changed', {
+      detail: this.prompts,
+      bubbles: true,
+      composed: true
+    }));
+  }
+
+  private handleGenreToggle(genreId: string) {
+    if (this.selectedGenreIds.has(genreId)) {
+      this.selectedGenreIds.delete(genreId);
+    } else {
+      this.selectedGenreIds.add(genreId);
+    }
+    // Create new Set to trigger reactivity
+    this.selectedGenreIds = new Set(this.selectedGenreIds);
+    
+    // Regenerate circle immediately
+    this.regenerateCircleWithSelectedGenres();
+  }
+
+  private handleSelectAllGenres() {
+    const mainGenres = mainGenresData as any[];
+    this.selectedGenreIds = new Set(mainGenres.map((g: any) => g.id));
+    this.regenerateCircleWithSelectedGenres();
+  }
+
+  private handleDeselectAllGenres() {
+    this.selectedGenreIds = new Set();
+    // Don't regenerate if nothing selected (or could show empty circle)
+    // this.regenerateCircleWithSelectedGenres();
+    this.requestUpdate();
+  }
+
   private formatSongDuration(seconds: number): string {
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
@@ -2781,6 +3002,37 @@ Always respond only in the following JSON format (exactly 5 objects):
               Download
             </button>
           </div>
+        </div>
+      </div>
+    `;
+  }
+
+  private renderGenreSelectorPanel() {
+    if (!this.showGenreSelector) return null;
+
+    const mainGenres = mainGenresData as any[];
+
+    return html`
+      <div id="genre-selector-panel" class=${classMap({ visible: this.showGenreSelector })}>
+        <h3>Genres auswählen</h3>
+        <div class="genre-selector-controls">
+          <button @click=${this.handleSelectAllGenres}>Alle auswählen</button>
+          <button @click=${this.handleDeselectAllGenres}>Alle abwählen</button>
+        </div>
+        <div class="genre-selector-list">
+          ${repeat(
+            mainGenres,
+            (genre) => genre.id,
+            (genre) => html`
+              <div class="genre-selector-item" @click=${() => this.handleGenreToggle(genre.id)}>
+                <div class=${classMap({ 
+                  'genre-selector-checkbox': true,
+                  'checked': this.selectedGenreIds.has(genre.id)
+                })}></div>
+                <div class="genre-selector-label">${genre.name}</div>
+              </div>
+            `
+          )}
         </div>
       </div>
     `;
@@ -3550,6 +3802,12 @@ Always respond only in the following JSON format (exactly 5 objects):
       <div id="header">
         <img id="header-logo" src="/Logo/Logo.png" alt="Logo" />
         <div id="header-controls">
+          <div id="genre-selector-button" @click=${this.toggleGenreSelector} title="Genres auswählen">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" fill="currentColor"/>
+            </svg>
+          </div>
+          ${this.renderGenreSelectorPanel()}
           <div id="songs-button" @click=${this.toggleSongsPanel} title="Generated Songs">
             ${this.kieGeneratedSongs.length > 0 ? html`
               <span class="badge">${this.kieGeneratedSongs.length}</span>

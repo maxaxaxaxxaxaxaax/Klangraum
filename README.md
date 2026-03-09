@@ -116,7 +116,7 @@ Klangraum/
 - **Google DeepMind Lyria** - Real-time music generation
 - **KIE.ai** - Song generation API
 - **Web Audio API** - Audio processing and analysis
-- **MQTT** - Event communication (if applicable)
+- **Web MIDI API** - MIDI controller integration
 
 ## Development
 

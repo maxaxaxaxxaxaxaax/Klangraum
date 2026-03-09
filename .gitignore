@@ -34,5 +34,8 @@ Songs/
 *.mp3
 *.wav
 
-# Lock files (optional - some teams prefer to commit these)
-# bun.lockb
+# Bun lock file (using npm/package-lock.json)
+bun.lockb
+
+# TypeScript build info
+*.tsbuildinfo

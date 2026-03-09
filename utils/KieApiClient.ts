@@ -31,7 +31,7 @@ export interface KieSongResult {
   // Local paths after saving
   localAudioPath?: string;
   localImagePath?: string;
-  localSourceAudioPath?: string;  // Pfad zum lokal gespeicherten Source-Audio
+  localSourceAudioPath?: string;
   // Generation metadata
   style?: string;
   lyrics?: string;
@@ -114,7 +114,6 @@ export async function generateSong(
   }
   
   const data = await response.json();
-  console.log('KIE.ai response:', JSON.stringify(data, null, 2));
 
   if (!data.data?.taskId) {
     throw new Error(`KIE.ai did not return a taskId. Response: ${JSON.stringify(data)}`);
@@ -141,13 +140,11 @@ export async function checkStatus(apiKey: string, taskId: string): Promise<KieSt
   }
   
   const data = await response.json();
-  console.log('KIE.ai status response:', JSON.stringify(data, null, 2));
 
   const status = data.data?.status || 'PENDING';
 
   if (status === 'SUCCESS') {
     const sunoData = data.data?.response?.sunoData || [];
-    console.log('KIE.ai sunoData:', JSON.stringify(sunoData, null, 2));
     return {
       status: 'SUCCESS',
       songs: sunoData.map((song: any) => ({
@@ -223,9 +220,6 @@ export async function pollUntilComplete(
 }
 
 /**
- * Complete workflow: Upload audio, generate song, poll for results.
- */
-/**
  * Save a song locally via the Vite dev server API.
  */
 export async function saveSongLocally(song: KieSongResult, songId: string, sourceAudioUrl?: string): Promise<KieSongResult> {
@@ -278,7 +272,6 @@ export async function loadLocalSongs(): Promise<KieSongResult[]> {
       localAudioPath: song.audioPath,
       localImagePath: song.imagePath,
       localSourceAudioPath: song.sourceAudioPath,
-      // Setze sourceAudioUrl auf den lokalen Pfad, wenn verfügbar
       sourceAudioUrl: song.sourceAudioPath || undefined,
     }));
   } catch (error) {
@@ -344,11 +337,9 @@ export async function generateSongFromBlob(
       style: options.style || '',
       lyrics: options.prompt || '',
       createdAt: Date.now(),
-      // Verwende lokalen Pfad wenn verfügbar, sonst die temporäre URL
       sourceAudioUrl: song.localSourceAudioPath || audioUrl,
     }));
 
-    console.log('Final songs to return:', JSON.stringify(songsWithMetadata, null, 2));
     onStatusChange?.('complete', 'Fertig!');
     return songsWithMetadata;
 

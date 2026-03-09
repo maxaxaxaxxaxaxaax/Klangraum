@@ -2547,11 +2547,8 @@ ${positionTendency}
 
 ${this.newCircleMessageTemplate.replace('{genres}', activeGenreNames.join(', '))}`;
 
-        console.log('Sending enhanced prompt to chat:', contextualPrompt);
-
         // Send message to agent and wait for response
         const response = await geminiAgent.sendMessage(contextualPrompt);
-        console.log('Received response from agent:', response);
 
         // Parse JSON response
         const generatedGenres = this.parseJsonResponse(response);
@@ -2560,7 +2557,6 @@ ${this.newCircleMessageTemplate.replace('{genres}', activeGenreNames.join(', '))
           // Use generated prompts
           initialPrompts = this.generatePromptsFromJson(generatedGenres);
           generationSuccess = true;
-          console.log('Successfully generated', initialPrompts.size, 'new prompts');
 
           // Also add to chat messages for display
           this.chatMessages = [...this.chatMessages, { role: 'user', content: contextualPrompt }];
@@ -4519,8 +4515,6 @@ ${this.newCircleMessageTemplate.replace('{genres}', activeGenreNames.join(', '))
     // Reload genre data to include it in the system instruction
     geminiAgent.reloadGenreData(baseInstruction);
     
-    // Show feedback
-    console.log('System-Anweisung gespeichert:', baseInstruction);
     this.requestUpdate();
   }
 

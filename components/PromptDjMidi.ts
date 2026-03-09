@@ -16,6 +16,11 @@ import { geminiAgent } from '../index';
 import { loadLocalSongs, deleteLocalSong, type KieSongResult } from '../utils/KieApiClient';
 
 // Hierarchical genre circle system
+interface CreationContext {
+  sourceGenres: Array<{ name: string; weight: number }>;
+  finderPosition: { x: number; y: number };
+}
+
 interface GenreCircle {
   id: string;
   prompts: Map<string, Prompt>;
@@ -25,6 +30,11 @@ interface GenreCircle {
   isExpanding: boolean;
   expansionProgress: number;
   radiusMultiplier: number; // Radius multiplier for this circle (0.1 to 0.6)
+  // Tree structure fields
+  parentCircleId: string | null;
+  childCircleIds: string[];
+  creationContext: CreationContext | null;
+  displayName: string;
 }
 
 /** The grid of prompt inputs. */
@@ -218,6 +228,38 @@ export class PromptDjMidi extends LitElement {
       gap: 8px;
       z-index: 100;
     }
+    .breadcrumb-nav {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 4px;
+    }
+    .breadcrumb-separator {
+      color: rgba(255, 255, 255, 0.5);
+      font-size: 14px;
+      margin: 0 2px;
+    }
+    .sibling-nav {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 4px;
+      padding-top: 4px;
+      border-top: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .sibling-info {
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 10px;
+      padding: 0 4px;
+    }
+    .sibling-button {
+      padding: 4px 8px;
+      min-width: 24px;
+    }
+    .sibling-button:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
     .circle-nav-button {
       padding: 6px 12px;
       background: rgba(0, 0, 0, 0.7);
@@ -227,6 +269,10 @@ export class PromptDjMidi extends LitElement {
       cursor: pointer;
       font-size: 11px;
       transition: all 0.2s;
+      max-width: 150px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
       &:hover {
         background: rgba(0, 0, 0, 0.9);
         border-color: rgba(255, 255, 255, 0.6);
@@ -1802,6 +1848,11 @@ Always respond only in the following JSON format (exactly 5 objects):
       isExpanding: false,
       expansionProgress: 1.0,
       radiusMultiplier: 0.35,
+      // Tree structure fields
+      parentCircleId: null,
+      childCircleIds: [],
+      creationContext: null,
+      displayName: 'Root',
     }];
     this.activeCircleIndex = 0;
   }
@@ -2422,17 +2473,21 @@ Always respond only in the following JSON format (exactly 5 objects):
   private async createNewGenreCircle() {
     const activeCircle = this.getActiveCircle();
     if (!activeCircle || activeCircle.isExpanding) return;
-    
+
     // Save current playback state and set to loading for animation
     const previousPlaybackState = this.playbackState;
     this.playbackState = 'loading';
     this.requestUpdate();
-    
+
+    // Capture creation context before creating new circle
+    const sourceGenres: Array<{ name: string; weight: number }> = [];
+    const finderPosition = { x: activeCircle.ringOffsetX, y: activeCircle.ringOffsetY };
+
     // New circle shows genres that are currently active in the mix (weight > 0.1)
     const activePrompts = new Map<string, Prompt>();
     const activeGenreNames: string[] = [];
     let index = 0;
-    
+
     // Get all prompts from the active circle that have weight > 0.1
     for (const prompt of activeCircle.prompts.values()) {
       if (prompt.weight > 0.1) {
@@ -2442,7 +2497,7 @@ Always respond only in the following JSON format (exactly 5 objects):
           weight: 0,
           cc: index++,
         });
-        
+
         // Get genre name for chat message
         let genreName = prompt.text;
         if (this.showingSubGenres && this.selectedMainGenreId) {
@@ -2462,34 +2517,53 @@ Always respond only in the following JSON format (exactly 5 objects):
           if (mainGenre) genreName = mainGenre.name;
         }
         activeGenreNames.push(genreName);
+        // Store genre with weight for context
+        sourceGenres.push({ name: genreName, weight: prompt.weight });
       }
     }
-    
+
+    // Sort sourceGenres by weight descending for better context
+    sourceGenres.sort((a, b) => b.weight - a.weight);
+
     // Try to generate new prompts from active genres
     let initialPrompts: Map<string, Prompt> = new Map();
     let generationSuccess = false;
-    
+
     if (activeGenreNames.length > 0) {
       try {
-        // Replace {genres} placeholder with actual genre names
-        const genreMessage = this.newCircleMessageTemplate.replace('{genres}', activeGenreNames.join(', '));
-        console.log('Sending genres to chat for generation:', activeGenreNames);
-        
+        // Build enhanced prompt with weights and position context
+        const genreWeightsList = sourceGenres
+          .map(g => `- ${g.name}: ${Math.round(g.weight * 100)}%`)
+          .join('\n');
+
+        // Describe finder position tendency
+        const positionTendency = this.describeFinderPosition(finderPosition.x, finderPosition.y);
+
+        // Enhanced prompt with context
+        const contextualPrompt = `The user is exploring with the following mix:
+${genreWeightsList}
+
+${positionTendency}
+
+${this.newCircleMessageTemplate.replace('{genres}', activeGenreNames.join(', '))}`;
+
+        console.log('Sending enhanced prompt to chat:', contextualPrompt);
+
         // Send message to agent and wait for response
-        const response = await geminiAgent.sendMessage(genreMessage);
+        const response = await geminiAgent.sendMessage(contextualPrompt);
         console.log('Received response from agent:', response);
-        
+
         // Parse JSON response
         const generatedGenres = this.parseJsonResponse(response);
-        
+
         if (generatedGenres && generatedGenres.length > 0) {
           // Use generated prompts
           initialPrompts = this.generatePromptsFromJson(generatedGenres);
           generationSuccess = true;
           console.log('Successfully generated', initialPrompts.size, 'new prompts');
-          
+
           // Also add to chat messages for display
-          this.chatMessages = [...this.chatMessages, { role: 'user', content: genreMessage }];
+          this.chatMessages = [...this.chatMessages, { role: 'user', content: contextualPrompt }];
           this.chatMessages = [...this.chatMessages, { role: 'assistant', content: response }];
         } else {
           console.warn('Failed to parse generated genres, falling back to active prompts');
@@ -2499,11 +2573,11 @@ Always respond only in the following JSON format (exactly 5 objects):
         // Fall through to fallback logic
       }
     }
-    
+
     // Restore previous playback state
     this.playbackState = previousPlaybackState;
     this.requestUpdate();
-    
+
     // Fallback: use active prompts if generation failed or no active genres
     if (!generationSuccess) {
       if (activePrompts.size > 0) {
@@ -2511,7 +2585,7 @@ Always respond only in the following JSON format (exactly 5 objects):
       } else {
         initialPrompts = new Map(this.originalPrompts);
       }
-      
+
       // Add fallback message to chat (without sending API call)
       if (activeGenreNames.length > 0) {
         const genreMessage = `Ein neuer Genre-Kreis wurde erstellt mit folgenden aktiven Genres: ${activeGenreNames.join(', ')}.`;
@@ -2524,7 +2598,16 @@ Always respond only in the following JSON format (exactly 5 objects):
       }
       this.requestUpdate();
     }
-    
+
+    // Generate semantic display name from top genres
+    const displayName = this.generateSemanticCircleName(sourceGenres);
+
+    // Create creation context
+    const creationContext: CreationContext = {
+      sourceGenres,
+      finderPosition,
+    };
+
     const newCircleId = `circle-${this.genreCircleStack.length}`;
     const newCircle: GenreCircle = {
       id: newCircleId,
@@ -2535,9 +2618,23 @@ Always respond only in the following JSON format (exactly 5 objects):
       isExpanding: true,
       expansionProgress: 0,
       radiusMultiplier: 0.35, // Default radius multiplier for new circles
+      // Tree structure fields
+      parentCircleId: activeCircle.id,
+      childCircleIds: [],
+      creationContext,
+      displayName,
     };
-    
-    this.genreCircleStack = [...this.genreCircleStack, newCircle];
+
+    // Update parent circle to include this child
+    const updatedParentCircle = {
+      ...activeCircle,
+      childCircleIds: [...activeCircle.childCircleIds, newCircleId],
+    };
+    const stackWithUpdatedParent = this.genreCircleStack.map(c =>
+      c.id === activeCircle.id ? updatedParentCircle : c
+    );
+
+    this.genreCircleStack = [...stackWithUpdatedParent, newCircle];
     this.activeCircleIndex = this.genreCircleStack.length - 1;
     
     // Animate expansion
@@ -2585,6 +2682,57 @@ Always respond only in the following JSON format (exactly 5 objects):
     requestAnimationFrame(animate);
   }
 
+  /**
+   * Describes the finder position tendency for context in AI prompts
+   */
+  private describeFinderPosition(x: number, y: number): string {
+    const distance = Math.sqrt(x * x + y * y);
+    const maxRadius = this.containerSize * 0.35; // Based on default radiusMultiplier
+
+    if (distance < maxRadius * 0.2) {
+      return 'Finder position is near center, indicating a balanced mix of all active genres.';
+    }
+
+    // Determine direction tendency
+    const angle = Math.atan2(y, x) * (180 / Math.PI);
+    let direction = '';
+    if (angle >= -45 && angle < 45) {
+      direction = 'right side of the circle';
+    } else if (angle >= 45 && angle < 135) {
+      direction = 'bottom of the circle';
+    } else if (angle >= -135 && angle < -45) {
+      direction = 'top of the circle';
+    } else {
+      direction = 'left side of the circle';
+    }
+
+    const intensity = distance > maxRadius * 0.7 ? 'strongly' : 'moderately';
+    return `Finder position is ${intensity} towards the ${direction}, suggesting a preference for genres in that area.`;
+  }
+
+  /**
+   * Generates a semantic name for a new circle based on source genres
+   */
+  private generateSemanticCircleName(sourceGenres: Array<{ name: string; weight: number }>): string {
+    if (sourceGenres.length === 0) {
+      return `Circle ${this.genreCircleStack.length}`;
+    }
+
+    // Take top 2-3 genres for naming
+    const topGenres = sourceGenres.slice(0, Math.min(3, sourceGenres.length));
+
+    if (topGenres.length === 1) {
+      return topGenres[0].name;
+    }
+
+    if (topGenres.length === 2) {
+      return `${topGenres[0].name}-${topGenres[1].name} Mix`;
+    }
+
+    // 3 genres: use first two + "Fusion"
+    return `${topGenres[0].name}-${topGenres[1].name} Fusion`;
+  }
+
   private navigateBack() {
     if (this.activeCircleIndex > 0) {
       this.persistActiveCirclePosition();
@@ -2612,6 +2760,79 @@ Always respond only in the following JSON format (exactly 5 objects):
       this.syncActiveCircleState();
       this.updateWeightsFromPosition();
       this.requestUpdate();
+    }
+  }
+
+  /**
+   * Navigate to parent circle in the tree structure
+   */
+  private navigateToParent() {
+    const activeCircle = this.getActiveCircle();
+    if (!activeCircle || !activeCircle.parentCircleId) return;
+
+    const parentIndex = this.genreCircleStack.findIndex(c => c.id === activeCircle.parentCircleId);
+    if (parentIndex >= 0) {
+      this.navigateToCircle(parentIndex);
+    }
+  }
+
+  /**
+   * Navigate to a specific child circle by ID
+   */
+  private navigateToChild(childId: string) {
+    const childIndex = this.genreCircleStack.findIndex(c => c.id === childId);
+    if (childIndex >= 0) {
+      this.navigateToCircle(childIndex);
+    }
+  }
+
+  /**
+   * Get sibling circles (other children of the same parent)
+   */
+  private getSiblingCircles(): GenreCircle[] {
+    const activeCircle = this.getActiveCircle();
+    if (!activeCircle || !activeCircle.parentCircleId) return [];
+
+    const parent = this.genreCircleStack.find(c => c.id === activeCircle.parentCircleId);
+    if (!parent) return [];
+
+    return parent.childCircleIds
+      .filter(id => id !== activeCircle.id)
+      .map(id => this.genreCircleStack.find(c => c.id === id))
+      .filter((c): c is GenreCircle => c !== undefined);
+  }
+
+  /**
+   * Navigate to next sibling circle
+   */
+  private navigateToNextSibling() {
+    const activeCircle = this.getActiveCircle();
+    if (!activeCircle || !activeCircle.parentCircleId) return;
+
+    const parent = this.genreCircleStack.find(c => c.id === activeCircle.parentCircleId);
+    if (!parent) return;
+
+    const siblingIds = parent.childCircleIds;
+    const currentIndex = siblingIds.indexOf(activeCircle.id);
+    if (currentIndex < siblingIds.length - 1) {
+      this.navigateToChild(siblingIds[currentIndex + 1]);
+    }
+  }
+
+  /**
+   * Navigate to previous sibling circle
+   */
+  private navigateToPrevSibling() {
+    const activeCircle = this.getActiveCircle();
+    if (!activeCircle || !activeCircle.parentCircleId) return;
+
+    const parent = this.genreCircleStack.find(c => c.id === activeCircle.parentCircleId);
+    if (!parent) return;
+
+    const siblingIds = parent.childCircleIds;
+    const currentIndex = siblingIds.indexOf(activeCircle.id);
+    if (currentIndex > 0) {
+      this.navigateToChild(siblingIds[currentIndex - 1]);
     }
   }
 
@@ -2819,6 +3040,11 @@ Always respond only in the following JSON format (exactly 5 objects):
       isExpanding: false,
       expansionProgress: 1.0,
       radiusMultiplier: 0.35,
+      // Tree structure fields
+      parentCircleId: null,
+      childCircleIds: [],
+      creationContext: null,
+      displayName: 'Root',
     }];
     this.activeCircleIndex = 0;
     
@@ -3003,6 +3229,86 @@ Always respond only in the following JSON format (exactly 5 objects):
             </button>
           </div>
         </div>
+      </div>
+    `;
+  }
+
+  /**
+   * Renders breadcrumb navigation showing the path from root to current circle
+   */
+  private renderBreadcrumbNavigation() {
+    const activeCircle = this.getActiveCircle();
+    if (!activeCircle) return html``;
+
+    // Build path from root to current circle
+    const path: GenreCircle[] = [];
+    let current: GenreCircle | undefined = activeCircle;
+
+    while (current) {
+      path.unshift(current);
+      if (current.parentCircleId) {
+        current = this.genreCircleStack.find(c => c.id === current!.parentCircleId);
+      } else {
+        break;
+      }
+    }
+
+    return html`
+      <div class="breadcrumb-nav">
+        ${path.map((circle, index) => {
+          const isActive = circle.id === activeCircle.id;
+          const circleIndex = this.genreCircleStack.findIndex(c => c.id === circle.id);
+          return html`
+            ${index > 0 ? html`<span class="breadcrumb-separator">›</span>` : ''}
+            <button
+              class=${classMap({
+                'circle-nav-button': true,
+                'active': isActive,
+              })}
+              @click=${() => this.navigateToCircle(circleIndex)}
+              title=${circle.creationContext
+                ? `Created from: ${circle.creationContext.sourceGenres.map(g => g.name).join(', ')}`
+                : 'Root circle'}>
+              ${circle.displayName}
+            </button>
+          `;
+        })}
+      </div>
+    `;
+  }
+
+  /**
+   * Renders sibling navigation if current circle has siblings
+   */
+  private renderSiblingNavigation() {
+    const activeCircle = this.getActiveCircle();
+    if (!activeCircle || !activeCircle.parentCircleId) return html``;
+
+    const parent = this.genreCircleStack.find(c => c.id === activeCircle.parentCircleId);
+    if (!parent || parent.childCircleIds.length <= 1) return html``;
+
+    const siblingIds = parent.childCircleIds;
+    const currentIndex = siblingIds.indexOf(activeCircle.id);
+    const hasPrev = currentIndex > 0;
+    const hasNext = currentIndex < siblingIds.length - 1;
+
+    return html`
+      <div class="sibling-nav">
+        <button
+          class="circle-nav-button sibling-button"
+          @click=${this.navigateToPrevSibling}
+          ?disabled=${!hasPrev}
+          title="Previous sibling">
+          ‹
+        </button>
+        <span class="sibling-info">${currentIndex + 1}/${siblingIds.length}</span>
+        <button
+          class="circle-nav-button sibling-button"
+          @click=${this.navigateToNextSibling}
+          ?disabled=${!hasNext}
+          title="Next sibling">
+          ›
+        </button>
       </div>
     `;
   }
@@ -3772,31 +4078,8 @@ Always respond only in the following JSON format (exactly 5 objects):
       </button>
       ${this.genreCircleStack.length > 1 ? html`
         <div id="circle-navigation">
-          <button
-            class=${classMap({ 
-              'circle-nav-button': true,
-              'active': this.activeCircleIndex === 0 
-            })}
-            @click=${() => this.navigateToCircle(0)}>
-            Root
-          </button>
-          ${this.genreCircleStack.slice(1).map((circle, index) => html`
-            <button
-              class=${classMap({ 
-                'circle-nav-button': true,
-                'active': this.activeCircleIndex === index + 1 
-              })}
-              @click=${() => this.navigateToCircle(index + 1)}>
-              Circle ${index + 1}
-            </button>
-          `)}
-          ${this.activeCircleIndex > 0 ? html`
-            <button
-              class="circle-nav-button"
-              @click=${this.navigateBack}>
-              ← Back
-            </button>
-          ` : ''}
+          ${this.renderBreadcrumbNavigation()}
+          ${this.renderSiblingNavigation()}
         </div>
       ` : ''}
       <div id="header">

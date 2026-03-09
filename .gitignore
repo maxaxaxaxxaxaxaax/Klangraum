@@ -28,3 +28,11 @@ dist-ssr
 
 # Windows reserved names
 nul
+
+# Generated audio files
+Songs/
+*.mp3
+*.wav
+
+# Lock files (optional - some teams prefer to commit these)
+# bun.lockb
